@@ -20,16 +20,18 @@ class trajetoController{
         $cidadeOrigem = filter_input(INPUT_POST,'cidadeOrigem',FILTER_VALIDATE_INT);
         $cidadeDestino = filter_input(INPUT_POST,'cidadeDestino',FILTER_VALIDATE_INT);
         $distancia = filter_input(INPUT_POST,'distancia',FILTER_VALIDATE_INT);
+        $preco = filter_input(INPUT_POST,'preco',FILTER_SANITIZE_STRING);
 
-        if(!$cidadeOrigem || !$cidadeDestino || !$distancia){
+        if(!$cidadeOrigem || !$cidadeDestino || !$distancia ||!$preco){
             return $this->Abrir('Preencha todos os dados.');
         }
-
+        
         
         $trajetoModel = new Trajeto();
         $trajetoModel->setcidadeOrigem($cidadeOrigem);
         $trajetoModel->setcidadeDestino($cidadeDestino);
         $trajetoModel->setdistancia($distancia);
+        $trajetoModel->setpreco($preco);
 
 
         if($trajetoModel->cadTrajeto()==true){

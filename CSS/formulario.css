@@ -19,7 +19,7 @@
     height: 480px;
     background:#8454E4;
     text-align: center;
-    border-radius: 20px;
+    border-radius: 8px;
 }
 form{
     margin-top: 20%;
@@ -27,7 +27,7 @@ form{
 }
 input{
     padding: 15px 30px;
-    border-radius: 15px;
+    border-radius: 8px;
     margin-bottom: 20px;
     font-size: 15px;
 }
@@ -47,7 +47,7 @@ textarea:focus,input:focus{
 button{
     width: 50%;
     height: 50px;
-    border-radius: 15px;
+    border-radius: 8px;
     text-align: center;
     text-transform: uppercase;
     font-weight: bold;

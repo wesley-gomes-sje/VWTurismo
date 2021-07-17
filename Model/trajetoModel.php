@@ -6,6 +6,7 @@ class Trajeto
     private $cidadeOrigem;
     private $cidadeDestino;
     private $distancia;
+    private $preco;
     public function __construct()
     { }
     public function getidTrajeto()
@@ -41,6 +42,16 @@ class Trajeto
     {
         $this->distancia = $distancia;
     }
+    public function getpreco()
+    {
+        return $this->preco;
+    }
+    public function setpreco($preco)
+    {
+        $this->preco = $preco;
+    }
+
+
     public function listCidOrigem()
     {
         $conexao = new conexao();
@@ -79,11 +90,12 @@ class Trajeto
         $conexao = new conexao();
         try {
             $con = new PDO($conexao->dsn, $conexao->user, $conexao->pass);
-            $sql = 'INSERT INTO trajeto (cidadeOrigem,cidadeDestino,distancia) VALUES (?,?,?);';
+            $sql = 'INSERT INTO trajeto (cidadeOrigem,cidadeDestino,distancia,preco) VALUES (?,?,?,?);';
             $pre = $con->prepare($sql);
             $pre->bindValue(1, $this->cidadeOrigem);
             $pre->bindValue(2, $this->cidadeDestino);
             $pre->bindValue(3, $this->distancia);
+            $pre->bindValue(4, $this->preco);
             if ($pre->execute()) {
                 return true;
             } else {
@@ -99,7 +111,7 @@ class Trajeto
         $conexao = new conexao();
         try {
             $con = new PDO($conexao->dsn, $conexao->user, $conexao->pass);
-            $sql = 'SELECT cO.nomeCidade AS cidadeOrigem,cD.nomeCidade AS cidadeDestino,t.distancia AS distancia FROM  cidade cO  INNER JOIN trajeto t ON cO.idCidade=t.cidadeOrigem INNER JOIN cidade cD ON cD.idCidade=t.cidadeDestino;';
+            $sql = 'SELECT cO.nomeCidade AS cidadeOrigem,cD.nomeCidade AS cidadeDestino,t.distancia AS distancia, t.preco as preco FROM  cidade cO  INNER JOIN trajeto t ON cO.idCidade=t.cidadeOrigem INNER JOIN cidade cD ON cD.idCidade=t.cidadeDestino;';
 
             if ($data = $con->query($sql)) {
                 return $data->fetchAll(PDO::FETCH_ASSOC);
