@@ -57,7 +57,7 @@ class Trajeto
         $conexao = new conexao();
         try {
             $con = new PDO($conexao->dsn, $conexao->user, $conexao->pass);
-            $sql = 'SELECT * FROM cidade order by nomeCidade ASC;';
+            $sql = 'SELECT * FROM cidade WHERE status=1 order by nomeCidade ASC;';
 
             if ($data = $con->query($sql)) {
                 return $data->fetchAll(PDO::FETCH_ASSOC);

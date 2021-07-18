@@ -111,9 +111,11 @@ class menuView
             <form action="index.php?modulo=trajetoController&metodo=salvTrajeto" method="POST">
             <h1>Cadastrar</h1>
             ' . "{$mensagem}" . '<br>
+            <p style="color:white">Cidade Origem</p>
             <select name="cidadeOrigem" placeholder="Cidade Origem" required>
             ' . $cidade . '
             </select>
+            <p style="color:white">Cidade Destino</p>
             <select name="cidadeDestino" placeholder="Cidade Destino" required>
             ' . $cidade . '
             </select>
@@ -153,15 +155,19 @@ class menuView
         <form action="index.php?modulo=passagemController&metodo=salvPassagem" method="POST">
         <h1>Comprar</h1>
         ' . "{$mensagem}" . '<br>
+        <p style="color:white">Escolha o onibus</p>
         <select name="onibus" placeholder="Onibus" required>
         ' . $onibus . '
         </select>
+        <p style="color:white">Cidade Origem</p>
         <select name="cidadeOrigem" placeholder="Cidade Origem" required>
             ' . $cidade . '
             </select>
+            <p style="color:white">Cidade Destino</p>
             <select name="cidadeDestino" placeholder="Cidade Destino" required>
             ' . $cidade . '
             </select>
+            <p style="color:white">Data</p>
         <input id="dataPassagem" type="date" name="data" placeholder="Data da Viagem" style="width: 262.5px"/>
         <button style="margin-bottom:15px; margin-top:2px">Comprar</button>
         </form>
@@ -179,7 +185,7 @@ class menuView
         $conteudo .=$table . $trH;
         foreach($passagemDB as $linha){
             $listagem = '<tr>';
-            $listagem .= '<td>' . $linha['data'] . '</td>' . '<td>' . $linha['cidadeOrigem'] . '</td>' . '<td>' . $linha['cidadeDestino'] . '</td>' .'<td>' .  $linha['distancia'] . '</td>' . '<td>' .'R$ ' . $linha['preco'] . '</td>';
+            $listagem .= '<td>' .(new DateTime($linha['data']))->format('d/m/Y') . '</td>' . '<td>' . $linha['cidadeOrigem'] . '</td>' . '<td>' . $linha['cidadeDestino'] . '</td>' .'<td>' .  $linha['distancia'] . '</td>' . '<td>' .'R$ ' . $linha['preco'] . '</td>';
             $listagem .= '</tr>';
             $conteudo .= $listagem;
         }
@@ -208,7 +214,7 @@ class menuView
         $conteudo .=$table . $trH;
         foreach($dataPassagem as $linha){
             $listagem = '<tr>';
-            $listagem .= '<td>' . $linha['data'] . '</td>' . '<td>' . $linha['cidadeOrigem'] . '</td>' . '<td>' . $linha['cidadeDestino'] . '</td>' .'<td>' .$linha['nomeOnibus'] . '</td>' .'<td>' .$linha['placa'] . '</td>' .  '<td>' .  $linha['distancia'] . '</td>' . '<td>' .'R$ ' . $linha['preco'] . '</td>';
+            $listagem .= '<td>' . (new DateTime($linha['data']))->format('d/m/Y')  . '</td>' . '<td>' . $linha['cidadeOrigem'] . '</td>' . '<td>' . $linha['cidadeDestino'] . '</td>' .'<td>' .$linha['nomeOnibus'] . '</td>' .'<td>' .$linha['placa'] . '</td>' .  '<td>' .  $linha['distancia'] . '</td>' . '<td>' .'R$ ' . $linha['preco'] . '</td>';
             $listagem .= '</tr>';
             $conteudo .= $listagem;
         }
@@ -237,7 +243,7 @@ class menuView
         $conteudo .=$table . $trH;
         foreach($dataTudo as $linha){
             $listagem = '<tr>';
-            $listagem .= '<td>' . $linha['data'] . '</td>' .'<td>' . $linha['nomeUsuario'] . '</td>' .  '<td>' . $linha['cidadeOrigem'] . '</td>' . '<td>' . $linha['cidadeDestino'] . '</td>' .'<td>' .$linha['nomeOnibus'] . '</td>' .'<td>' .$linha['placa'] . '</td>' .  '<td>' .  $linha['distancia'] . '</td>' . '<td>' .'R$ ' . $linha['preco'] . '</td>';
+            $listagem .= '<td>' . (new DateTime($linha['data']))->format('d/m/Y') . '</td>' .'<td>' . $linha['nomeUsuario'] . '</td>' .  '<td>' . $linha['cidadeOrigem'] . '</td>' . '<td>' . $linha['cidadeDestino'] . '</td>' .'<td>' .$linha['nomeOnibus'] . '</td>' .'<td>' .$linha['placa'] . '</td>' .  '<td>' .  $linha['distancia'] . '</td>' . '<td>' .'R$ ' . $linha['preco'] . '</td>';
             $listagem .= '</tr>';
             $conteudo .= $listagem;
         }
