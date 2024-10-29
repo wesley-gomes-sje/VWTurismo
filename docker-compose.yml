@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: vw_turismo
+    ports:
+      - "8080:80"  # Exponha a porta 80 do contêiner na porta 8080 do host
+    volumes:
+      - .:/var/www/html  # Monte o diretório para ver alterações instantâneas no código
+    depends_on:
+      - db
+
+  db:
+    image: mysql:8.0
+    container_name: vw_turismo_db
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE} 
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    volumes:
+      - db_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+
+volumes:
+  db_data:
