@@ -2,7 +2,7 @@
 
 require 'vendor/autoload.php';
 
-class Conexao {
+class Connection {
     private $dsn;
     private $user;
     private $pass;
@@ -16,7 +16,7 @@ class Conexao {
         $this->pass = getenv('MYSQL_PASSWORD');
     }
 
-    public function conectar() {
+    public function connect() {
         try {
             $pdo = new PDO($this->dsn, $this->user, $this->pass);
             $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
