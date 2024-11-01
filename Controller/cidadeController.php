@@ -1,6 +1,6 @@
 <?php
 require_once './View/menuView.php';
-require_once './Model/cidadeModel.php';
+require_once './Model/cityModel.php';
 class cidadeController
 {
     public function __construct()
@@ -9,8 +9,8 @@ class cidadeController
     }
     public function Abrir($mensagem = '',$data=[])
     { 
-        $cidadeModel = new Cidade();
-        $data = $cidadeModel->listCidade();
+        $cityModel = new Cidade();
+        $data = $cityModel->listCidade();
         $conteudo = new menuView();
         return $conteudo->salvCidade($mensagem,$data);
     }
@@ -21,10 +21,10 @@ class cidadeController
 
             return $this->Abrir('Preencha todos os dados.');
         }
-        $cidadeModel = new Cidade();
-        $cidadeModel->setnomeCidade($nomeCidade);
-        if ($cidadeModel->cadCidade()== true) {
-            $data = $cidadeModel->listCidade();
+        $cityModel = new Cidade();
+        $cityModel->setnomeCidade($nomeCidade);
+        if ($cityModel->cadCidade()== true) {
+            $data = $cityModel->listCidade();
            return $this->Abrir('Salvo',$data);
           }
           return $this->Abrir('erro.');
@@ -33,8 +33,8 @@ class cidadeController
     public function excluir(){
         $id= filter_input(INPUT_GET,'id',FILTER_VALIDATE_INT);
         if(is_int($id)){
-           $cidadeModel = new Cidade($id);
-          if($cidadeModel->excluir($id)==true){
+           $cityModel = new Cidade($id);
+          if($cityModel->excluir($id)==true){
             return $this->Abrir('Cidade excluida.');
           };
 
@@ -44,8 +44,8 @@ class cidadeController
         $id= filter_input(INPUT_GET,'id',FILTER_VALIDATE_INT);
         if(is_int($id)){
            
-            $cidadeModel = new Cidade($id);
-            $dados = $cidadeModel->listCidadeUnica($id);
+            $cityModel = new Cidade($id);
+            $dados = $cityModel->listCidadeUnica($id);
 
             $conteudo = new menuView();
           return $conteudo->editarCidade($dados);
@@ -60,8 +60,8 @@ class cidadeController
             return $this->Abrir('Preencha todos os dados.');
         }
 
-        $cidadeModel = new Cidade();
-        if($cidadeModel->editar($id,$nomeCidade)==true){
+        $cityModel = new Cidade();
+        if($cityModel->editar($id,$nomeCidade)==true){
             return $this->Abrir('Editado.');
         };
 

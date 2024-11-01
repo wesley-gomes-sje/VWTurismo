@@ -1,5 +1,5 @@
 <?php
-require_once './Model/trajetoModel.php';
+require_once './Model/routeModel.php';
 require_once './View/menuView.php';
 
 class trajetoController{
@@ -8,9 +8,9 @@ class trajetoController{
 
     public function Abrir($mensagem = '',$dataBD = [],$dataCidades = [])
     {
-        $trajetoModel = new Trajeto();
-        $dataCidades = $trajetoModel->listCidOrigem();
-        $dataBD = $trajetoModel->listTrajeto();
+        $routeModel = new Trajeto();
+        $dataCidades = $routeModel->listCidOrigem();
+        $dataBD = $routeModel->listTrajeto();
         //print_r($dataBD);
         $conteudo = new menuView();
         $conteudo->salvTrajeto($mensagem,$dataBD,$dataCidades);
@@ -27,18 +27,18 @@ class trajetoController{
         }
         
         
-        $trajetoModel = new Trajeto();
-        $trajetoModel->setcidadeOrigem($cidadeOrigem);
-        $trajetoModel->setcidadeDestino($cidadeDestino);
-        $trajetoModel->setdistancia($distancia);
-        $trajetoModel->setpreco($preco);
+        $routeModel = new Trajeto();
+        $routeModel->setcidadeOrigem($cidadeOrigem);
+        $routeModel->setcidadeDestino($cidadeDestino);
+        $routeModel->setdistancia($distancia);
+        $routeModel->setpreco($preco);
 
 
-        if($trajetoModel->cadTrajeto()==true){
+        if($routeModel->cadTrajeto()==true){
 
-            //$dataBD = $trajetoModel->listTrajeto();
+            //$dataBD = $routeModel->listTrajeto();
             //print_r($dataBD);
-            $dataCidades = $trajetoModel->listCidOrigem();
+            $dataCidades = $routeModel->listCidOrigem();
            $this->Abrir('Salvo',[],$dataCidades);
         }
         else{

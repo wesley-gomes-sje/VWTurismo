@@ -1,5 +1,5 @@
 <?php
-require_once './Model/onibusModel.php';
+require_once './Model/vehicleModel.php';
 require_once './View/menuView.php';
 class onibusController
 {
@@ -7,8 +7,8 @@ class onibusController
     { }
     public function Abrir($mensagem = '',$data=[])
     {
-        $onibusModel = new Onibus();
-        $data = $onibusModel->listOnibus();
+        $vehicleModel = new Onibus();
+        $data = $vehicleModel->listOnibus();
         $conteudo = new menuView();
         return $conteudo->salvOnibus($mensagem,$data);
     }
@@ -21,11 +21,11 @@ class onibusController
 
             return $this->Abrir('Preencha todos os dados.');
         }
-        $onibusModel = new Onibus();
-        $onibusModel->setnomeOnibus($nomeOnibus);
-        $onibusModel->setplaca($placa);
-        if ($onibusModel->cadOnibus() == true) {
-          $data = $onibusModel->listOnibus();
+        $vehicleModel = new Onibus();
+        $vehicleModel->setnomeOnibus($nomeOnibus);
+        $vehicleModel->setplaca($placa);
+        if ($vehicleModel->cadOnibus() == true) {
+          $data = $vehicleModel->listOnibus();
          return $this->Abrir('Salvo',$data);
         }
         return $this->Abrir('erro.');

@@ -1,5 +1,5 @@
 <?php
-require_once './Model/usuarioModel.php';
+require_once './Model/userModel.php';
 require_once './View/cadUsuarioView.php';
 
 class usuarioController
@@ -24,16 +24,16 @@ class usuarioController
             return $this->preencheCampos('Preencha todos os campos!');
         }
        
-        $usuarioModel = new Usuario();
-        $usuarioModel->setnomeUsuario($nomeUsuario);
-        $usuarioModel->setemailUsuario($emailUsuario);
-        $usuarioModel->setsenha($senha);
+        $userModel = new Usuario();
+        $userModel->setnomeUsuario($nomeUsuario);
+        $userModel->setemailUsuario($emailUsuario);
+        $userModel->setsenha($senha);
 
         if ($senha == $senhaConfirma) {
-            if ($usuarioModel->verUsuario($emailUsuario) == true) {
+            if ($userModel->verUsuario($emailUsuario) == true) {
                 return $this->preencheCampos('Usuario já cadastrado.');
             } else {
-                $retorno = $usuarioModel->cadUsuario();
+                $retorno = $userModel->cadUsuario();
                 if ($retorno == true) {
                     return $this->preencheCampos('Usuario cadastrado.');
                 } else {

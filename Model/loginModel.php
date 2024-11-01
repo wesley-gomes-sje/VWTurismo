@@ -1,54 +1,60 @@
 <?php
-require_once './conexao.php';
+require_once './connection.php';
 class Login
 {
-    private $emailUsuario;
-    private $senha;
+    private $email;
+    private $password;
     public function __construct()
     { 
         
     }
-    public function getemailUsuario()
+    public function getEmail()
     {
-        return $this->emailUsuario;
+        return $this->email;
     }
-    public function setemailUsuario($emailUsuario)
+    public function setEmail($email)
     {
-        $this->emailUsuario = $emailUsuario;
+        $this->email = $email;
     }
-    public function getsenha()
+    public function getPassword()
     {
-        return $this->senha;
+        return $this->password;
     }
-    public function setsenha($senha)
+    public function setPassword($password)
     {
-        $this->senha = $senha;
+        $this->password = $password;
     }
-    public function login($emailUsuario, $senha)
+    public function login($email, $password)
     {
-        $conexao = new conexao();
+        $connection = new connection();
+        $pdo = $connection->connect();
+        
+        if (!$pdo) {
+            echo "Falha ao conectar ao banco de dados.";
+            return false;
+        }
 
         try {
             
-            $con = new PDO($conexao->dsn, $conexao->user, $conexao->pass);
-            $sql = $con->prepare("SELECT idUsuario,emailUsuario,senha,status,nomeUsuario FROM usuario WHERE emailUsuario=:emailUsuario AND senha=:senha;");
-            $sql->bindValue(":emailUsuario", $emailUsuario);
-            $sql->bindValue(":senha", $senha);
+            $sql = $pdo->prepare("SELECT id,email,password,status,name FROM users WHERE email=:email AND password=:password;");
+            $sql->bindValue(":email", $email);
+            $sql->bindValue(":password", $password);
             $sql->execute();
+            
             if ($sql->rowCount() > 0) {
                 $query = $sql->fetchAll(PDO::FETCH_ASSOC);
-                $_SESSION['idUsuario'] = $query[0]['idUsuario'];
-                $_SESSION['emailUsuario'] = $query[0]['emailUsuario'];
-                $_SESSION['senha'] = $query[0]['senha'];
+                $_SESSION['idUser'] = $query[0]['id'];
+                $_SESSION['email'] = $query[0]['email'];
+                $_SESSION['password'] = $query[0]['password'];
                 $_SESSION['status'] = $query[0]['status'];
-                $_SESSION['nomeUsuario'] = $query[0]['nomeUsuario'];
+                $_SESSION['name'] = $query[0]['name'];
                 return true;
             } else {
-                unset($_SESSION['idUsuario']);
-                unset($_SESSION['emailUsuario']);
-                unset($_SESSION['senha']);
+                unset($_SESSION['idUser']);
+                unset($_SESSION['email']);
+                unset($_SESSION['password']);
                 unset($_SESSION['status']);
-                unset($_SESSION['nomeUsuario']);
+                unset($_SESSION['name']);
                 return false;
             }
         } catch (PDOException $e) { }
