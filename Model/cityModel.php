@@ -1,6 +1,6 @@
 <?php
 require_once './connection.php';
-class Cidade
+class City
 {
     private $id;
     private $name;

@@ -36,7 +36,9 @@ class Login
 
         try {
             
-            $sql = $pdo->prepare("SELECT id,email,password,status,name FROM users WHERE email=:email AND password=:password;");
+            $sql = $pdo->prepare("SELECT id,email,password,status,name 
+            FROM users 
+            WHERE email=:email AND password=:password;");
             $sql->bindValue(":email", $email);
             $sql->bindValue(":password", $password);
             $sql->execute();

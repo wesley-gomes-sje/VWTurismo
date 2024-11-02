@@ -1,6 +1,6 @@
 <?php
 
-require_once './Model/passagemModel.php';
+require_once './Model/ticketModel.php';
 require_once './View/menuView.php';
 
 class passagemController
@@ -9,9 +9,9 @@ class passagemController
     { }
     public function Abrir($mensagem = '', $passagemDB=[])
     {
-        $passagemModel = new Passagem();
-        $dataCidades = $passagemModel->listCidOrigem();
-        $onibusDB = $passagemModel->listOnibus();
+        $ticketModel = new Passagem();
+        $dataCidades = $ticketModel->listCidOrigem();
+        $onibusDB = $ticketModel->listOnibus();
         $conteudo = new menuView();
         $conteudo->salvPassagem($mensagem, $dataCidades, $onibusDB,$passagemDB);
     }
@@ -27,23 +27,23 @@ class passagemController
         if (!$idUsuario || !$cidadeOrigem || !$cidadeDestino || !$data) {
             return $this->Abrir('Preencha todos os dados.');
         }
-        $passagemModel = new Passagem();
-        $existeTrajeto = $passagemModel->verificaTrajeto($cidadeOrigem, $cidadeDestino);
+        $ticketModel = new Passagem();
+        $existeTrajeto = $ticketModel->verificaTrajeto($cidadeOrigem, $cidadeDestino);
 
         if ($existeTrajeto == false) {
             return $this->Abrir('Trajeto não existe!');
         } else {
-            $passagemModel = new Passagem();
-            $passagemModel->verificaTrajeto($cidadeOrigem, $cidadeDestino);
+            $ticketModel = new Passagem();
+            $ticketModel->verificaTrajeto($cidadeOrigem, $cidadeDestino);
 
-            $passagemModel->setidUsuario($idUsuario);
-            $passagemModel->setidOnibus($idOnibus);
+            $ticketModel->setidUsuario($idUsuario);
+            $ticketModel->setidOnibus($idOnibus);
             $idTrajeto = $_SESSION['idTrajeto'];
-            $passagemModel->setidTrajeto($idTrajeto);
-            $passagemModel->setdata($data);
+            $ticketModel->setidTrajeto($idTrajeto);
+            $ticketModel->setdata($data);
 
-            if ($passagemModel->cadPassagem() == true) {
-                $passagemDB = $passagemModel->listPassagem($idUsuario);
+            if ($ticketModel->cadPassagem() == true) {
+                $passagemDB = $ticketModel->listPassagem($idUsuario);
                 return $this->Abrir('Passagem Comprada.',$passagemDB);
             } else {
                 return $this->Abrir('Erro');
@@ -53,14 +53,14 @@ class passagemController
 
     public function listPassagem(){
         $idUsuario = $_SESSION['idUsuario'];
-        $passagemModel = new Passagem();
-        $dataPassagem =  $passagemModel->listPassagemTudo($idUsuario);
+        $ticketModel = new Passagem();
+        $dataPassagem =  $ticketModel->listPassagemTudo($idUsuario);
             $conteudo = new menuView();
             return $conteudo->listPassagem($dataPassagem);
     }
     public function listTudo(){
-        $passagemModel = new Passagem();
-        $data = $passagemModel->listTudo();
+        $ticketModel = new Passagem();
+        $data = $ticketModel->listTudo();
         $conteudo = new menuView();
         $conteudo->listTudo($data);
 

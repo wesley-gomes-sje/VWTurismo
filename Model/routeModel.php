@@ -75,7 +75,10 @@ class Route
     public function all()
     {
         try {
-            $sql = 'SELECT cO.name AS cityOrigin,cD.name AS cityDestination,r.distance AS distance  FROM  cities cO  INNER JOIN routes r ON cO.id=r.origin INNER JOIN cities cD ON cD.id=t.destination;';
+            $sql = 'SELECT cO.name AS cityOrigin,cD.name AS cityDestination,r.distance AS distance  
+            FROM  cities cO  
+            INNER JOIN routes r ON cO.id=r.origin 
+            INNER JOIN cities cD ON cD.id=t.destination;';
             $data = $this->pdo->query($sql);
 
             if ($data) {
@@ -87,22 +90,6 @@ class Route
         } catch (PDOException $errorAll) {
             echo $errorAll->getMessage();
             return false;
-        }
-    }
-
-    public function allCityOrigin() // vou acessar a classe de city para buscar os dados
-    {
-        try {
-            $sql = 'SELECT * FROM cities WHERE status=1 order by name ASC;';
-            $data = $this->pdo->query($sql);
-            if ($data) {
-                return $data->fetchAll(PDO::FETCH_ASSOC);
-            } else {
-                return array('response' => 'erro');
-            }
-        } catch (PDOException $errorAllCityOrigin) {
-            echo $errorAllCityOrigin->getMessage();
-            return array('response' => 'erro');
         }
     }
 }

@@ -10,7 +10,7 @@ class CreateTicketsTable
             passenger INT NOT NULL,
             route INT NOT NULL,
             vehicle INT NOT NULL,
-            title VARCHAR(100) NOT NULL,
+            price INT NOT NULL,
             date DATE NOT NULL,
             status TINYINT(1) DEFAULT 1,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
