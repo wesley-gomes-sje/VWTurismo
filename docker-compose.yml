@@ -7,9 +7,11 @@ services:
       dockerfile: Dockerfile
     container_name: vw_turismo
     ports:
-      - "8080:80"  # Exponha a porta 80 do contêiner na porta 8080 do host
+      - "8080:80"
     volumes:
-      - .:/var/www/html  # Monte o diretório para ver alterações instantâneas no código
+      - .:/var/www/html
+    env_file:
+      - .env
     depends_on:
       - db
 

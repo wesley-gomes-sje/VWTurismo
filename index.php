@@ -1,6 +1,6 @@
 <?php
 require_once './Controller/loginController.php';
-require_once './Controller/usuarioController.php';
+require_once './Controller/userController.php';
 require_once './Controller/onibusController.php';
 require_once './Controller/cidadeController.php';
 require_once './Controller/trajetoController.php';
