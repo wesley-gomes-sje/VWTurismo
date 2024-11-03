@@ -34,7 +34,7 @@ class Login
 
         try {
 
-            $sql = $pdo->prepare("SELECT id,name,emial,profile
+            $sql = $pdo->prepare("SELECT *
             FROM users 
             WHERE email = :email;");
             $sql->bindValue(":email", $email);

@@ -16,11 +16,13 @@
   
         <div class="esquerda">
         <img style="margin-top: 50px;" src="https://img.icons8.com/wired/64/000000/bus.png"/>
-        <p>Seja bem vindo</p>
+        <?php
+        echo "<p>Seja bem-vindo, " . $_SESSION['name'] . "</p>";
+        ?>
         
             <div class="opcoes">
 
-                <a href="index.php?modulo=onibusController&metodo=Abrir">
+                <a href="index.php?modulo=vehicleController&metodo=Open">
                     <input type="submit" value="Cadastrar Onibus"></a>
 
                 <a href="index.php?modulo=cidadeController&metodo=Abrir">
