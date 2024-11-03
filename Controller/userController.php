@@ -37,10 +37,10 @@ class userController
         $this->fillFields('Usuario cadastrado.');
     }
     
-    public function fillFields($mensagem = '')
+    public function fillFields($message = '')
     {
-        $usuarioView = new cadUsuarioView();
-        $usuarioView->formulario($mensagem);
+        $userView = new cadUsuarioView();
+        $userView->formulario($message);
     }
     
     private function checkPassword(string $password, string $confirmPassword): bool

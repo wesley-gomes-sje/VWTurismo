@@ -23,5 +23,5 @@ if(isset($_GET['modulo']) && isset($_GET['metodo'])){
  else{
    
     $loginController = new loginController();
-    $loginController->preencherLogin();
+    $loginController->fillLogin();
 }

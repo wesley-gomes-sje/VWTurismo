@@ -4,10 +4,8 @@ class Login
 {
     private $email;
     private $password;
-    public function __construct()
-    { 
-        
-    }
+    public function __construct() {}
+    
     public function getEmail()
     {
         return $this->email;
@@ -28,37 +26,38 @@ class Login
     {
         $connection = new connection();
         $pdo = $connection->connect();
-        
+
         if (!$pdo) {
             echo "Falha ao conectar ao banco de dados.";
             return false;
         }
 
         try {
-            
-            $sql = $pdo->prepare("SELECT id,email,password,status,name 
+
+            $sql = $pdo->prepare("SELECT id,name,emial,profile
             FROM users 
-            WHERE email=:email AND password=:password;");
+            WHERE email = :email;");
             $sql->bindValue(":email", $email);
-            $sql->bindValue(":password", $password);
             $sql->execute();
-            
+
             if ($sql->rowCount() > 0) {
                 $query = $sql->fetchAll(PDO::FETCH_ASSOC);
-                $_SESSION['idUser'] = $query[0]['id'];
-                $_SESSION['email'] = $query[0]['email'];
-                $_SESSION['password'] = $query[0]['password'];
-                $_SESSION['status'] = $query[0]['status'];
-                $_SESSION['name'] = $query[0]['name'];
-                return true;
-            } else {
-                unset($_SESSION['idUser']);
-                unset($_SESSION['email']);
-                unset($_SESSION['password']);
-                unset($_SESSION['status']);
-                unset($_SESSION['name']);
+                $hashedPassword = $query[0]['password'];
+                if (password_verify($password, $hashedPassword)) {
+                    $_SESSION['idUser'] = $query[0]['id'];
+                    $_SESSION['email'] = $query[0]['email'];
+                    $_SESSION['profile'] = $query[0]['profile'];
+                    $_SESSION['name'] = $query[0]['name'];
+                    return true;
+                }
+                echo "Senha incorreta.";
                 return false;
             }
-        } catch (PDOException $e) { }
+            echo "Usuario não encontrado.";
+            return false;
+        } catch (PDOException $e) {
+            echo "Erro ao realizar o login: " . $e->getMessage();
+            return false;
+        }
     }
 }

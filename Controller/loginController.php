@@ -5,44 +5,50 @@ require_once './View/cadUsuarioView.php';
 require_once './View/menuView.php';
 class loginController
 {
-    public function __construct()
-    { }
-
-    public function preencherLogin($mensagem = '')
-    {
-        $usuarioView = new cadUsuarioView();
-        $usuarioView->formLogin($mensagem);
-    }
+    public function __construct() {}
 
     public function login()
     {
-        $emailUsuario = filter_input(INPUT_POST, 'emailUsuario', FILTER_SANITIZE_EMAIL);
-        $senha = filter_input(INPUT_POST, 'senha', FILTER_SANITIZE_STRING);
+        $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
+        $password = $this->sanitizeString($_POST['password'] ?? '');
 
-        if (!$emailUsuario || !$senha) {
 
-            return $this->preencherLogin('Usuario e senha são obrigatórios.');
+        if (!$email || !$password) {
+
+            $this->fillLogin('Usuário e senha são obrigatórios.');
+            return;
         }
 
         $loginModel = new Login();
-        $loginModel->setemailUsuario($emailUsuario);
-        $loginModel->setsenha($senha);
-        $getEmail = $loginModel->getemailUsuario();
-        $getSenha = $loginModel->getsenha();
-        $islogin = $loginModel->login($getEmail, $getSenha);
+        $loginModel->setEmail($email);
+        $loginModel->setPassword($password);
 
-        if ($islogin == false) {
+        $getEmail = $loginModel->getEmail();
+        $getPassword = $loginModel->getPassword();
 
-            return $this->preencherLogin('Usuario ou senha invalido.');
+        $islogin = $loginModel->login($getEmail, $getPassword);
+        if (!$islogin) {
+
+            $this->fillLogin('Usuario ou senha invalido.');
+            return;
         }
 
-        if ($_SESSION['status'] == "1") {
-           $menuView = new menuView();
-           return $menuView->telaCliente();
+        $menuView = new menuView();
+        
+        if ($_SESSION['profile'] == "user") {
+            return $menuView->telaCliente();
+        } 
+        return $menuView->telaAdm();
+    }
 
-        } else if ($_SESSION['status'] == "2") {
-            $menuView = new menuView();
-            return $menuView->telaAdm();
-        }
+    public function fillLogin($message = '')
+    {
+        $userView = new cadUsuarioView();
+        $userView->formLogin($message);
+    }
+
+    private function sanitizeString(?string $string): string
+    {
+        return htmlspecialchars(strip_tags($string ?? ''), ENT_QUOTES, 'UTF-8');
     }
 }
