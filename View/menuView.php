@@ -53,13 +53,13 @@ class menuView
 
 
     //fORMULARIO DE SALVAR CIDADES
-    public function salvCidade($mensagem, $data)
+    public function registerCity($mensagem, $data)
     {
         $conteudo = '<div class="FormEsquerda formbase">
-        <form action="index.php?modulo=cidadeController&metodo=salvCidade" method="POST">
+        <form action="index.php?modulo=cityController&metodo=register" method="POST">
         <h1>Cadastrar</h1>
             ' . "{$mensagem}" . '<br>
-            <input type="text" name="nomeCidade" placeholder="Digite o nome da Cidade" required />
+            <input type="text" name="name" placeholder="Digite o nome da Cidade" required />
             <button>Salvar</button>
         </form>
     </div>
@@ -73,9 +73,9 @@ class menuView
         $conteudo .= $table . $trH;
         foreach ($data as $linha) {
             $listagem = '<tr>';
-            $listagem .= '<td style="width:80px">' . $linha['nomeCidade'] . '</td>' . '<td>' . '<a href="index.php?modulo=cidadeController&metodo=editar&id=' . $linha['idCidade'] . '">
+            $listagem .= '<td style="width:80px">' . $linha['name'] . '</td>' . '<td>' . '<a href="index.php?modulo=cityController&metodo=show&id=' . $linha['id'] . '">
             <button style="width:100%" type="button" >Editar</button></a>' . '</td>'
-                . '<td style="width:70px">' . '<a href="index.php?modulo=cidadeController&metodo=excluir&id=' . $linha['idCidade'] . '">
+                . '<td style="width:70px">' . '<a href="index.php?modulo=cityController&metodo=delete&id=' . $linha['id'] . '">
             <button style="width:100%" type="button">Excluir</button></a>' . '</td>';
             $listagem .= '</tr>';
             $conteudo .= $listagem;
@@ -89,14 +89,14 @@ class menuView
 
 
     //EDITAR A CIDADE FORM ABRE
-    public function editarCidade($dados)
+    public function editCity($dados)
     {
-        $idCidade = $dados[0]['idCidade'];
-        $nomeCidade = $dados[0]['nomeCidade'];
+        $id = $dados[0]['id'];
+        $name = $dados[0]['name'];
         $conteudo = '<div class="FormEsquerda formbase">
-            <form action="index.php?modulo=cidadeController&metodo=editarCidade&id=' . $idCidade . '" method="POST">
+            <form action="index.php?modulo=cityController&metodo=edit&id=' . $id . '" method="POST">
             <h1>Editar</h1>
-            <input type="text" name="nomeCidade" value=' . "{$nomeCidade}" . ' required />
+            <input type="text" name="name" value="' . $name . '" required />
             <button>Salvar</button>
             </form>
             </div>';

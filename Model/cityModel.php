@@ -53,7 +53,7 @@ class City
     public function all()
     {
         try {
-            $sql = 'SELECT DISTINCT * FROM cities WHERE status=1 order by name ASC;';
+            $sql = 'SELECT  * FROM cities WHERE status= 1 order by name ASC;';
             $data = $this->pdo->query($sql);
 
             if ($data) {
@@ -106,7 +106,7 @@ class City
     public function edit($id, $name)
     {
         try {
-            $sql = 'UPDATE cities SET name=:name WHERE id=:id;';
+            $sql = 'UPDATE cities SET name= :name WHERE id= :id;';
             $pre = $this->pdo->prepare($sql);
             $pre->bindValue(":id", $id);
             $pre->bindValue(":name", $name);

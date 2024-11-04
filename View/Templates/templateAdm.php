@@ -25,7 +25,7 @@
                 <a href="index.php?modulo=vehicleController&metodo=Open">
                     <input type="submit" value="Cadastrar Onibus"></a>
 
-                <a href="index.php?modulo=cidadeController&metodo=Abrir">
+                <a href="index.php?modulo=cityController&metodo=Open">
                     <input type="submit" value="Cadastrar Cidade"> </a>
 
                 <a href="index.php?modulo=trajetoController&metodo=Abrir">
