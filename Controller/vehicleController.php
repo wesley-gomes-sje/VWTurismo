@@ -3,14 +3,18 @@ require_once './Model/vehicleModel.php';
 require_once './View/menuView.php';
 class vehicleController
 {
-    public function __construct() {}
+    private $vehicleModel;
+    private $vehicleView;
+    
+    public function __construct() {
+        $this->vehicleModel = new Vehicle();
+        $this->vehicleView = new menuView();
+    }
 
     public function Open($message = '', $data = [])
     {
-        $vehicleModel = new Vehicle();
-        $data = $vehicleModel->all();
-        $vehicleView = new menuView();
-        return $vehicleView->createVehicle($message, $data);
+        $data = $this->vehicleModel->all();
+        return $this->vehicleView->createVehicle($message, $data);
     }
 
     public function  createVehicle()
@@ -26,18 +30,17 @@ class vehicleController
             return;
         }
         
-        $vehicleModel = new Vehicle();
-        $vehicleModel->setBrand($brand);
-        $vehicleModel->setModel($model);
-        $vehicleModel->setPlate($plate);
-        $vehicleModel->setYear($year);
+        $this->vehicleModel->setBrand($brand);
+        $this->vehicleModel->setModel($model);
+        $this->vehicleModel->setPlate($plate);
+        $this->vehicleModel->setYear($year);
         
-        if (!$vehicleModel->register()) {
+        if (!$this->vehicleModel->register()) {
              $this->Open('Erro ao registrar veículo');
              return;
         }
         
-        $data = $vehicleModel->all();
+        $data = $this->vehicleModel->all();
         return $this->Open('Veículo registrado com sucesso.', $data);
     }
     
