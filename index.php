@@ -3,7 +3,7 @@ require_once './Controller/loginController.php';
 require_once './Controller/userController.php';
 require_once './Controller/vehicleController.php';
 require_once './Controller/cityController.php';
-require_once './Controller/trajetoController.php';
+require_once './Controller/routeController.php';
 require_once './Controller/passagemController.php';
 require_once './View/menuView.php';
 

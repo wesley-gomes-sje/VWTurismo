@@ -28,7 +28,7 @@
                 <a href="index.php?modulo=cityController&metodo=Open">
                     <input type="submit" value="Cadastrar Cidade"> </a>
 
-                <a href="index.php?modulo=trajetoController&metodo=Abrir">
+                <a href="index.php?modulo=routeController&metodo=Open">
                     <input type="submit" value="Cadastrar Trajetos"> </a>
 
                 <a href="index.php?modulo=passagemController&metodo=listTudo">

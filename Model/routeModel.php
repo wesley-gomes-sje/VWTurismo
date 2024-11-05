@@ -75,10 +75,10 @@ class Route
     public function all()
     {
         try {
-            $sql = 'SELECT cO.name AS cityOrigin,cD.name AS cityDestination,r.distance AS distance  
+            $sql = 'SELECT cO.name AS origin,cD.name AS destination,r.distance AS distance  
             FROM  cities cO  
             INNER JOIN routes r ON cO.id=r.origin 
-            INNER JOIN cities cD ON cD.id=t.destination;';
+            INNER JOIN cities cD ON cD.id=r.destination;';
             $data = $this->pdo->query($sql);
 
             if ($data) {

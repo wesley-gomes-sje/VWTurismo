@@ -108,23 +108,22 @@ class menuView
 
 
     //fORMULARIO DE SALVAR TRAJETOS
-    public function salvTrajeto($mensagem, $dataBD, $dataCidades)
+    public function registerRoute($message, $data, $cities)
     {
-        $cidade = $this->listCidade($dataCidades);
+        $city = $this->listCidade($cities);
         $conteudo = '<div class="FormEsquerda formbase"style="height: auto">
-            <form action="index.php?modulo=trajetoController&metodo=salvTrajeto" method="POST">
+            <form action="index.php?modulo=routeController&metodo=register" method="POST">
             <h1>Cadastrar</h1>
-            ' . "{$mensagem}" . '<br>
+            ' . "{$message}" . '<br>
             <p style="color:white">Cidade Origem</p>
-            <select name="cidadeOrigem" placeholder="Cidade Origem" required>
-            ' . $cidade . '
+            <select name="origin" placeholder="Cidade Origem" required>
+            ' . $city . '
             </select>
             <p style="color:white">Cidade Destino</p>
-            <select name="cidadeDestino" placeholder="Cidade Destino" required>
-            ' . $cidade . '
+            <select name="destination" placeholder="Cidade Destino" required>
+            ' . $city . '
             </select>
-            <input id="distancia" type="number" name="distancia" placeholder="Distancia em KM" required />
-            <input id="preco" type="number" name="preco" placeholder="R$" required /> 
+            <input id="distance" type="number" name="distance" placeholder="Distancia em KM" required />
             <button style="margin-bottom:40px; margin-top:20px">Salvar</button>
             </form>
              </div>
@@ -134,15 +133,14 @@ class menuView
         $trH = '<tr>
              <th> Origem </th>
              <th> Destino </th>
-             <th> DistanciaKm </th>
-             <th> Preço </th>
+             <th> Distancia </th>
           </tr>';
         $conteudo .= $table . $trH;
-        foreach ($dataBD as $linha) {
-            $listagem = '<tr>';
-            $listagem .= '<td>' . $linha['cidadeOrigem'] . '</td>' . '<td>' . $linha['cidadeDestino'] . '</td>' . '<td>' . $linha['distancia'] . '</td>' . '<td>' . 'R$ ' . $linha['preco'] . '</td>';
-            $listagem .= '</tr>';
-            $conteudo .= $listagem;
+        foreach ($data as $line) {
+            $list = '<tr>';
+            $list .= '<td>' . $line['origin'] . '</td>' . '<td>' . $line['destination'] . '</td>' . '<td>' . $line['distance'] . '</td>';
+            $list .= '</tr>';
+            $conteudo .= $list;
         }
         $conteudo .= '</table>';
         $conteudo .= '</div>';
@@ -291,7 +289,7 @@ class menuView
     {
         $cidade = '';
         foreach ($dataCidades as $linha) {
-            $cidade .=  '<option value="' . $linha['idCidade'] . '">' . $linha['nomeCidade'] . '</option>';
+            $cidade .=  '<option value="' . $linha['id'] . '">' . $linha['name'] . '</option>';
         }
         return $cidade;
     }

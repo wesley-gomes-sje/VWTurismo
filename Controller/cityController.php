@@ -59,6 +59,12 @@ class cityController
         return $this->cityView->editCity($data);
     }
     
+    public function all()
+    {
+        $data = $this->cityModel->all();
+        return $data;
+    }
+    
     public function edit()
     {
         $id = $this->sanitizeString($_GET['id'] ?? '');
