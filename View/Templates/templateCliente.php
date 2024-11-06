@@ -16,9 +16,9 @@
         <img style="margin-top: 50px;" src="https://img.icons8.com/wired/64/000000/bus.png"/>
         <p>Seja bem vindo</p>
             <div class="opcoes">
-            <a href="index.php?modulo=passagemController&metodo=Abrir">
+            <a href="index.php?modulo=ticketsController&metodo=Open">
                 <input type="submit" value="Comprar Passagens"></a>
-                <a href="index.php?modulo=passagemController&metodo=listPassagem">
+                <a href="index.php?modulo=ticketsController&metodo=all">
                 <input type="submit" value="Minhas Passagens"></a>
             </div>
             <a href="./index.php">

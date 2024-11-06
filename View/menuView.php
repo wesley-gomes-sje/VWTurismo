@@ -110,6 +110,8 @@ class menuView
     //fORMULARIO DE SALVAR TRAJETOS
     public function registerRoute($message, $data, $cities)
     {
+
+        
         $city = $this->listCidade($cities);
         $conteudo = '<div class="FormEsquerda formbase"style="height: auto">
             <form action="index.php?modulo=routeController&metodo=register" method="POST">
@@ -150,28 +152,28 @@ class menuView
 
 
     //COMPRAR PASSAGEM
-    public function salvPassagem($mensagem, $dataCidades, $onibusDB, $passagemDB)
+    public function registerTicket($mensagem, $dataCidades, $onibusDB, $passagemDB)
     {
         $onibus = $this->listOnibus($onibusDB);
         $cidade = $this->listCidade($dataCidades);
         $conteudo = '<div class="FormPassagem formbase" style="height: auto">
-        <form action="index.php?modulo=passagemController&metodo=salvPassagem" method="POST">
+        <form action="index.php?modulo=ticketsController&metodo=register" method="POST">
         <h1>Comprar</h1>
         ' . "{$mensagem}" . '<br>
         <p style="color:white">Escolha o onibus</p>
-        <select name="onibus" placeholder="Onibus" required>
+        <select name="vehicle" placeholder="Onibus" required>
         ' . $onibus . '
         </select>
         <p style="color:white">Cidade Origem</p>
-        <select name="cidadeOrigem" placeholder="Cidade Origem" required>
+        <select name="origin" placeholder="Cidade Origem" required>
             ' . $cidade . '
             </select>
             <p style="color:white">Cidade Destino</p>
-            <select name="cidadeDestino" placeholder="Cidade Destino" required>
+            <select name="destination" placeholder="Cidade Destino" required>
             ' . $cidade . '
             </select>
             <p style="color:white">Data</p>
-        <input id="dataPassagem" type="date" name="data" placeholder="Data da Viagem" style="width: 262.5px"/>
+        <input id="date" type="date" name="date" placeholder="Data da Viagem" style="width: 262.5px"/>
         <button style="margin-bottom:15px; margin-top:2px">Comprar</button>
         </form>
         </div>
@@ -188,7 +190,7 @@ class menuView
         $conteudo .= $table . $trH;
         foreach ($passagemDB as $linha) {
             $listagem = '<tr>';
-            $listagem .= '<td>' . (new DateTime($linha['data']))->format('d/m/Y') . '</td>' . '<td>' . $linha['cidadeOrigem'] . '</td>' . '<td>' . $linha['cidadeDestino'] . '</td>' . '<td>' .  $linha['distancia'] . '</td>' . '<td>' . 'R$ ' . $linha['preco'] . '</td>';
+            $listagem .= '<td>' . (new DateTime($linha['date']))->format('d/m/Y') . '</td>' . '<td>' . $linha['origin'] . '</td>' . '<td>' . $linha['destination'] . '</td>' . '<td>' .  $linha['distance'] . '</td>' . '<td>' . 'R$ ' . $linha['price'] . '</td>';
             $listagem .= '</tr>';
             $conteudo .= $listagem;
         }
@@ -201,7 +203,7 @@ class menuView
 
 
     //LISTAGEM DE PASSAGENS CLIENTE
-    public function listPassagem($dataPassagem)
+    public function all($dataPassagem)
     {
         $conteudo = '<div class="FormDireita formbase" style="width: auto;height:auto">
         <h1>Verificar</h1>';
@@ -210,7 +212,8 @@ class menuView
         <th> Data </th>
         <th> Origem </th>
         <th> Destino </th>
-        <th> Onibus </th>
+        <th> Marca </th>
+        <th> Modelo </th>
         <th> Placa </th>
         <th> Distancia KM</th>
         <th> Preço </th>
@@ -218,7 +221,7 @@ class menuView
         $conteudo .= $table . $trH;
         foreach ($dataPassagem as $linha) {
             $listagem = '<tr>';
-            $listagem .= '<td>' . (new DateTime($linha['data']))->format('d/m/Y')  . '</td>' . '<td>' . $linha['cidadeOrigem'] . '</td>' . '<td>' . $linha['cidadeDestino'] . '</td>' . '<td>' . $linha['nomeOnibus'] . '</td>' . '<td>' . $linha['placa'] . '</td>' .  '<td>' .  $linha['distancia'] . '</td>' . '<td>' . 'R$ ' . $linha['preco'] . '</td>';
+            $listagem .= '<td>' . (new DateTime($linha['date']))->format('d/m/Y')  . '</td>' . '<td>' . $linha['origin'] . '</td>' . '<td>' . $linha['destination'] . '</td>' . '<td>' . $linha['brand'] . '</td>' . '<td>' . $linha['model'] . '</td>' . '<td>' . $linha['plate'] . '</td>' .  '<td>' .  $linha['distance'] . '</td>' . '<td>' . 'R$ ' . $linha['price'] . '</td>';
             $listagem .= '</tr>';
             $conteudo .= $listagem;
         }
@@ -248,7 +251,7 @@ class menuView
         $conteudo .= $table . $trH;
         foreach ($dataTudo as $linha) {
             $listagem = '<tr>';
-            $listagem .= '<td>' . (new DateTime($linha['data']))->format('d/m/Y') . '</td>' . '<td>' . $linha['nomeUsuario'] . '</td>' .  '<td>' . $linha['cidadeOrigem'] . '</td>' . '<td>' . $linha['cidadeDestino'] . '</td>' . '<td>' . $linha['nomeOnibus'] . '</td>' . '<td>' . $linha['placa'] . '</td>' .  '<td>' .  $linha['distancia'] . '</td>' . '<td>' . 'R$ ' . $linha['preco'] . '</td>';
+            $listagem .= '<td>' . (new DateTime($linha['date']))->format('d/m/Y') . '</td>' . '<td>' . $linha['name'] . '</td>' .  '<td>' . $linha['origin'] . '</td>' . '<td>' . $linha['destination'] . '</td>' . '<td>' . $linha['brand'] . '</td>' .'<td>' . $linha['model'] . '</td>' . '<td>' . $linha['plate'] . '</td>' .  '<td>' .  $linha['distance'] . '</td>' . '<td>' . 'R$ ' . $linha['price'] . '</td>';
             $listagem .= '</tr>';
             $conteudo .= $listagem;
         }
@@ -297,7 +300,7 @@ class menuView
     {
         $onibus = '';
         foreach ($onibusDB as $linha) {
-            $onibus .= '<option value="' . $linha['idOnibus'] . '">' . $linha['nomeOnibus'] . '</option>';
+            $onibus .= '<option value="' . $linha['id'] . '">' . $linha['brand'] . '</option>';
         }
         return $onibus;
     }

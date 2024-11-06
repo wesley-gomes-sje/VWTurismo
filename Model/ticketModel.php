@@ -146,12 +146,13 @@ class Ticket
     public function all()
     {
         try {
-            $sql = 'SELECT  t.date AS date, t.price AS price, co.name AS origin, cd.name AS destination, r.distance AS distance
+            $sql = 'SELECT u.name AS name, t.date AS date, t.price AS price, co.name AS origin, cd.name AS destination, r.distance AS distance, v.brand AS brand, v.model AS model, v.plate AS plate
             FROM tickets t
             INNER JOIN routes r ON t.route=r.id
             INNER JOIN cities co ON r.origin=co.id
             INNER JOIN cities cd ON r.destination=cd.id
             INNER JOIN users u ON t.passenger=u.id
+              INNER JOIN vehicles v ON t.vehicle=v.id  
             ORDER BY t.date DESC;';
             $data = $this->pdo->query($sql);
 
@@ -168,12 +169,13 @@ class Ticket
     public function showTicketsByPassenger($passenger)
     {
         try {
-            $sql = 'SELECT  t.date AS date, t.price AS price, co.name AS origin, cd.name AS destination, r.distance AS distance
+            $sql = 'SELECT  t.date AS date, t.price AS price, v.brand AS brand, v.model AS model, v.plate AS plate,  co.name AS origin, cd.name AS destination, r.distance AS distance
             FROM tickets t
             INNER JOIN routes r ON t.route=r.id
             INNER JOIN cities co ON r.origin=co.id
             INNER JOIN cities cd ON r.destination=cd.id
-            INNER JOIN users u ON t.passenger=u.id           
+            INNER JOIN users u ON t.passenger=u.id 
+            INNER JOIN vehicles v ON t.vehicle=v.id          
             WHERE t.passenger = ?;';
             $pre = $this->pdo->prepare($sql);
             $pre->bindValue(1, $passenger);
@@ -186,5 +188,10 @@ class Ticket
             echo $errorShowTicketsByPassenger->getMessage();
             return false;
         }
+    }
+    
+    public function calculatePrice($distance)
+    {
+        return $distance * 0.5;
     }
 }

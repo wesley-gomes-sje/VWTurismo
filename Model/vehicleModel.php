@@ -85,7 +85,7 @@ class Vehicle
     public function all()
     {
         try {
-            $sql = 'SELECT brand,model,plate, year FROM vehicles order by year ASC;';
+            $sql = 'SELECT id, brand,model,plate, year FROM vehicles order by year ASC;';
             $data = $this->pdo->query($sql);
             if ($data) {
                 return $data->fetchAll(PDO::FETCH_ASSOC);

@@ -31,7 +31,7 @@
                 <a href="index.php?modulo=routeController&metodo=Open">
                     <input type="submit" value="Cadastrar Trajetos"> </a>
 
-                <a href="index.php?modulo=passagemController&metodo=listTudo">
+                <a href="index.php?modulo=ticketsController&metodo=show">
                     <input type="submit" value="Controle Passagens"></a>
 
                 <a href="index.php?modulo=clienteController&metodo=listCliente">

@@ -92,4 +92,22 @@ class Route
             return false;
         }
     }
+    
+    public function check($origin, $destination)
+    {
+        try {
+            $sql = 'SELECT id, distance FROM routes WHERE origin = ? AND destination = ?;';
+            $pre = $this->pdo->prepare($sql);
+            $pre->bindValue(1, $origin);
+            $pre->bindValue(2, $destination);
+            if ($pre->execute()) {
+                return $pre->fetch(PDO::FETCH_ASSOC);
+            } else {
+                print_r($pre->errorInfo());
+            }
+        } catch (PDOException $errorCheck) {
+            echo $errorCheck->getMessage();
+            return false;
+        }
+    }
 }
