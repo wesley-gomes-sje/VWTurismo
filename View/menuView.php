@@ -3,22 +3,22 @@ class menuView
 {
     public function __construct() {}
     //DIRECIONAMENTO PARA TELAS
-    public function telaAdm()
+    public function admin()
     {
-        $conteudo = '<img src="./assets/logo.PNG" class="img">';
+        $content = '<img src="./assets/logo.PNG" class="img">';
         include './View/Templates/templateAdm.php';
     }
-    public function telaCliente()
+    public function customer()
     {
-        $conteudo = '<img src="./assets/logo.PNG"> ';
-        include './View/Templates/templateCliente.php';
+        $content = '<img src="./assets/logo.PNG"> ';
+        include './View/Templates/templateCustomer.php';
     }
 
 
     //fORMULARIO DE SALVAR ONIBUS
     public function createVehicle($message, $data)
     {
-        $conteudo = '<div class="FormEsquerda formbase">
+        $content = '<div class="FormEsquerda formbase">
         <form action="index.php?modulo=vehicleController&metodo=createVehicle" method="POST">
             <h1>Cadastrar</h1>
             ' . "{$message}" . '<br>
@@ -38,27 +38,27 @@ class menuView
             <th> Placa </th>
             <th> Ano </th>
          </tr>';
-        $conteudo .= $table . $trH;
-        foreach ($data as $linha) {
-            $listagem =  '<tr>';
-            $listagem .= '<td>' . $linha['brand'] . '</td>' . '<td>' . $linha['model'] . '</td>' .  '<td>' . $linha['plate'] . '</td>' .'<td>' . $linha['year'] . '</td>';
-            $listagem .= '</tr>';
-            $conteudo .= $listagem;
+        $content .= $table . $trH;
+        foreach ($data as $item) {
+            $listing =  '<tr>';
+            $listing .= '<td>' . $item['brand'] . '</td>' . '<td>' . $item['model'] . '</td>' .  '<td>' . $item['plate'] . '</td>' .'<td>' . $item['year'] . '</td>';
+            $listing .= '</tr>';
+            $content .= $listing;
         };
-        $conteudo .= '</table>';
-        $conteudo .= '</div>';
+        $content .= '</table>';
+        $content .= '</div>';
         include './View/Templates/templateAdm.php';
     }
 
 
 
     //fORMULARIO DE SALVAR CIDADES
-    public function registerCity($mensagem, $data)
+    public function registerCity($message, $data)
     {
-        $conteudo = '<div class="FormEsquerda formbase">
+        $content = '<div class="FormEsquerda formbase">
         <form action="index.php?modulo=cityController&metodo=register" method="POST">
         <h1>Cadastrar</h1>
-            ' . "{$mensagem}" . '<br>
+            ' . "{$message}" . '<br>
             <input type="text" name="name" placeholder="Digite o nome da Cidade" required />
             <button>Salvar</button>
         </form>
@@ -70,18 +70,18 @@ class menuView
         <th> Cidades </th>
         <th> Ações </th>
      </tr>';
-        $conteudo .= $table . $trH;
-        foreach ($data as $linha) {
-            $listagem = '<tr>';
-            $listagem .= '<td style="width:80px">' . $linha['name'] . '</td>' . '<td>' . '<a href="index.php?modulo=cityController&metodo=show&id=' . $linha['id'] . '">
+        $content .= $table . $trH;
+        foreach ($data as $item) {
+            $listing = '<tr>';
+            $listing .= '<td style="width:80px">' . $item['name'] . '</td>' . '<td>' . '<a href="index.php?modulo=cityController&metodo=show&id=' . $item['id'] . '">
             <button style="width:100%" type="button" >Editar</button></a>' . '</td>'
-                . '<td style="width:70px">' . '<a href="index.php?modulo=cityController&metodo=delete&id=' . $linha['id'] . '">
+                . '<td style="width:70px">' . '<a href="index.php?modulo=cityController&metodo=delete&id=' . $item['id'] . '">
             <button style="width:100%" type="button">Excluir</button></a>' . '</td>';
-            $listagem .= '</tr>';
-            $conteudo .= $listagem;
+            $listing .= '</tr>';
+            $content .= $listing;
         }
-        $conteudo .= '</table>';
-        $conteudo .= '</div>';
+        $content .= '</table>';
+        $content .= '</div>';
         include './View/Templates/templateAdm.php';
     }
 
@@ -89,11 +89,11 @@ class menuView
 
 
     //EDITAR A CIDADE FORM ABRE
-    public function editCity($dados)
+    public function editCity($data)
     {
-        $id = $dados[0]['id'];
-        $name = $dados[0]['name'];
-        $conteudo = '<div class="FormEsquerda formbase">
+        $id = $data[0]['id'];
+        $name = $data[0]['name'];
+        $content = '<div class="FormEsquerda formbase">
             <form action="index.php?modulo=cityController&metodo=edit&id=' . $id . '" method="POST">
             <h1>Editar</h1>
             <input type="text" name="name" value="' . $name . '" required />
@@ -112,8 +112,8 @@ class menuView
     {
 
         
-        $city = $this->listCidade($cities);
-        $conteudo = '<div class="FormEsquerda formbase"style="height: auto">
+        $city = $this->listCities($cities);
+        $content = '<div class="FormEsquerda formbase"style="height: auto">
             <form action="index.php?modulo=routeController&metodo=register" method="POST">
             <h1>Cadastrar</h1>
             ' . "{$message}" . '<br>
@@ -137,29 +137,29 @@ class menuView
              <th> Destino </th>
              <th> Distancia </th>
           </tr>';
-        $conteudo .= $table . $trH;
+        $content .= $table . $trH;
         foreach ($data as $line) {
             $list = '<tr>';
             $list .= '<td>' . $line['origin'] . '</td>' . '<td>' . $line['destination'] . '</td>' . '<td>' . $line['distance'] . '</td>';
             $list .= '</tr>';
-            $conteudo .= $list;
+            $content .= $list;
         }
-        $conteudo .= '</table>';
-        $conteudo .= '</div>';
+        $content .= '</table>';
+        $content .= '</div>';
         include './View/Templates/templateAdm.php';
     }
 
 
 
     //COMPRAR PASSAGEM
-    public function registerTicket($mensagem, $dataCidades, $onibusDB, $passagemDB)
+    public function registerTicket($message, $cities, $vehicles, $tickets)
     {
-        $onibus = $this->listOnibus($onibusDB);
-        $cidade = $this->listCidade($dataCidades);
-        $conteudo = '<div class="FormPassagem formbase" style="height: auto">
+        $onibus = $this->listVehicles($vehicles);
+        $cidade = $this->listCities($cities);
+        $content = '<div class="FormPassagem formbase" style="height: auto">
         <form action="index.php?modulo=ticketsController&metodo=register" method="POST">
         <h1>Comprar</h1>
-        ' . "{$mensagem}" . '<br>
+        ' . "{$message}" . '<br>
         <p style="color:white">Escolha o onibus</p>
         <select name="vehicle" placeholder="Onibus" required>
         ' . $onibus . '
@@ -187,25 +187,25 @@ class menuView
         <th> Distancia KM</th>
         <th> Preço </th>
         </tr>';
-        $conteudo .= $table . $trH;
-        foreach ($passagemDB as $linha) {
-            $listagem = '<tr>';
-            $listagem .= '<td>' . (new DateTime($linha['date']))->format('d/m/Y') . '</td>' . '<td>' . $linha['origin'] . '</td>' . '<td>' . $linha['destination'] . '</td>' . '<td>' .  $linha['distance'] . '</td>' . '<td>' . 'R$ ' . $linha['price'] . '</td>';
-            $listagem .= '</tr>';
-            $conteudo .= $listagem;
+        $content .= $table . $trH;
+        foreach ($tickets as $item) {
+            $listing = '<tr>';
+            $listing .= '<td>' . (new DateTime($item['date']))->format('d/m/Y') . '</td>' . '<td>' . $item['origin'] . '</td>' . '<td>' . $item['destination'] . '</td>' . '<td>' .  $item['distance'] . '</td>' . '<td>' . 'R$ ' . $item['price'] . '</td>';
+            $listing .= '</tr>';
+            $content .= $listing;
         }
-        $conteudo .= '</table>';
-        $conteudo .= '</div>';
-        include './View/Templates/templateCliente.php';
+        $content .= '</table>';
+        $content .= '</div>';
+        include './View/Templates/templateCustomer.php';
     }
 
 
 
 
     //LISTAGEM DE PASSAGENS CLIENTE
-    public function all($dataPassagem)
+    public function all($tickets)
     {
-        $conteudo = '<div class="FormDireita formbase" style="width: auto;height:auto">
+        $content = '<div class="FormDireita formbase" style="width: auto;height:auto">
         <h1>Verificar</h1>';
         $table = '<table class="tabelaVerifica" style="margin: 0px 35px;margin-bottom:20px">';
         $trH = '<tr >
@@ -218,24 +218,24 @@ class menuView
         <th> Distancia KM</th>
         <th> Preço </th>
         </tr>';
-        $conteudo .= $table . $trH;
-        foreach ($dataPassagem as $linha) {
-            $listagem = '<tr>';
-            $listagem .= '<td>' . (new DateTime($linha['date']))->format('d/m/Y')  . '</td>' . '<td>' . $linha['origin'] . '</td>' . '<td>' . $linha['destination'] . '</td>' . '<td>' . $linha['brand'] . '</td>' . '<td>' . $linha['model'] . '</td>' . '<td>' . $linha['plate'] . '</td>' .  '<td>' .  $linha['distance'] . '</td>' . '<td>' . 'R$ ' . $linha['price'] . '</td>';
-            $listagem .= '</tr>';
-            $conteudo .= $listagem;
+        $content .= $table . $trH;
+        foreach ($tickets as $line) {
+            $listing = '<tr>';
+            $listing .= '<td>' . (new DateTime($line['date']))->format('d/m/Y')  . '</td>' . '<td>' . $line['origin'] . '</td>' . '<td>' . $line['destination'] . '</td>' . '<td>' . $line['brand'] . '</td>' . '<td>' . $line['model'] . '</td>' . '<td>' . $line['plate'] . '</td>' .  '<td>' .  $line['distance'] . '</td>' . '<td>' . 'R$ ' . $line['price'] . '</td>';
+            $listing .= '</tr>';
+            $content .= $listing;
         }
-        $conteudo .= '</table>';
-        $conteudo .= '</div>';
-        include './View/Templates/templateCliente.php';
+        $content .= '</table>';
+        $content .= '</div>';
+        include './View/Templates/templateCustomer.php';
     }
 
 
 
     //LISTAR TODAS AS PASSAGENS
-    public function listTudo($dataTudo)
+    public function allTickets($data)
     {
-        $conteudo = '<div class="FormDireita formbase" style="width: auto;height:auto">
+        $content = '<div class="FormDireita formbase" style="width: auto;height:auto">
         <h1>Verificar</h1>';
         $table = '<table class="tabelaVerifica" style="margin: 0px 35px;margin-bottom:20px">';
         $trH = '<tr >
@@ -248,39 +248,39 @@ class menuView
         <th> Distancia KM</th>
         <th> Preço </th>
         </tr>';
-        $conteudo .= $table . $trH;
-        foreach ($dataTudo as $linha) {
-            $listagem = '<tr>';
-            $listagem .= '<td>' . (new DateTime($linha['date']))->format('d/m/Y') . '</td>' . '<td>' . $linha['name'] . '</td>' .  '<td>' . $linha['origin'] . '</td>' . '<td>' . $linha['destination'] . '</td>' . '<td>' . $linha['brand'] . '</td>' .'<td>' . $linha['model'] . '</td>' . '<td>' . $linha['plate'] . '</td>' .  '<td>' .  $linha['distance'] . '</td>' . '<td>' . 'R$ ' . $linha['price'] . '</td>';
-            $listagem .= '</tr>';
-            $conteudo .= $listagem;
+        $content .= $table . $trH;
+        foreach ($data as $line) {
+            $listing = '<tr>';
+            $listing .= '<td>' . (new DateTime($line['date']))->format('d/m/Y') . '</td>' . '<td>' . $line['name'] . '</td>' .  '<td>' . $line['origin'] . '</td>' . '<td>' . $line['destination'] . '</td>' . '<td>' . $line['brand'] . '</td>' .'<td>' . $line['model'] . '</td>' . '<td>' . $line['plate'] . '</td>' .  '<td>' .  $line['distance'] . '</td>' . '<td>' . 'R$ ' . $line['price'] . '</td>';
+            $listing .= '</tr>';
+            $content .= $listing;
         }
-        $conteudo .= '</table>';
-        $conteudo .= '</div>';
+        $content .= '</table>';
+        $content .= '</div>';
         include './View/Templates/templateAdm.php';
     }
 
 
 
     //LISTAGEM DE CLIENTES
-    public function listCliente($data)
+    public function custormers($data)
     {
-        $conteudo = '<div class="FormDireita formbase">
+        $content = '<div class="FormDireita formbase">
         <h1>Listagem</h1>';
         $table = '<table>';
         $trH = '<tr>
             <th> Clientes </th>
             <th> E-mail </th>
          </tr>';
-        $conteudo .= $table . $trH;
+        $content .= $table . $trH;
         foreach ($data as $linha) {
             $listagem = '<tr>';
-            $listagem .= '<td>' . $linha['nomeUsuario'] . '</td>' . '<td>' . $linha['emailUsuario'] . '</td>';
+            $listagem .= '<td>' . $linha['name'] . '</td>' . '<td>' . $linha['email'] . '</td>';
             $listagem .= '</tr>';
-            $conteudo .= $listagem;
+            $content .= $listagem;
         }
-        $conteudo .= '</table>';
-        $conteudo .= '</div>';
+        $content .= '</table>';
+        $content .= '</div>';
         include './View/Templates/templateAdm.php';
     }
 
@@ -288,20 +288,21 @@ class menuView
 
 
     //LISTAGEM DAS OPÇÕES
-    public function listCidade($dataCidades)
+    public function listCities($data)
     {
-        $cidade = '';
-        foreach ($dataCidades as $linha) {
-            $cidade .=  '<option value="' . $linha['id'] . '">' . $linha['name'] . '</option>';
+        $city = '';
+        foreach ($data as $item) {
+            $city .=  '<option value="' . $item['id'] . '">' . $item['name'] . '</option>';
         }
-        return $cidade;
+        return $city;
     }
-    public function listOnibus($onibusDB)
+    
+    public function listVehicles($data)
     {
-        $onibus = '';
-        foreach ($onibusDB as $linha) {
-            $onibus .= '<option value="' . $linha['id'] . '">' . $linha['brand'] . '</option>';
+        $vehicle = '';
+        foreach ($data as $item) {
+            $vehicle .= '<option value="' . $item['id'] . '">' . $item['brand'] . '</option>';
         }
-        return $onibus;
+        return $vehicle;
     }
 }

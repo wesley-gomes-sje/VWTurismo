@@ -11,7 +11,7 @@ class vehicleController
         $this->vehicleView = new menuView();
     }
 
-    public function Open($message = '', $data = [])
+    public function open($message = '', $data = [])
     {
         $data = $this->vehicleModel->all();
         return $this->vehicleView->createVehicle($message, $data);
@@ -26,7 +26,7 @@ class vehicleController
 
         if (!$brand || !$model || !$plate || !$year) {
 
-            $this->Open('Preencha todos os dados.');
+            $this->open('Preencha todos os dados.');
             return;
         }
         
@@ -36,12 +36,12 @@ class vehicleController
         $this->vehicleModel->setYear($year);
         
         if (!$this->vehicleModel->register()) {
-             $this->Open('Erro ao registrar veículo');
+             $this->open('Erro ao registrar veículo');
              return;
         }
         
         $data = $this->vehicleModel->all();
-        return $this->Open('Veículo registrado com sucesso.', $data);
+        return $this->open('Veículo registrado com sucesso.', $data);
     }
     
     private function sanitizeString(?string $string): string

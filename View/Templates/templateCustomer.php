@@ -16,7 +16,7 @@
         <img style="margin-top: 50px;" src="https://img.icons8.com/wired/64/000000/bus.png"/>
         <p>Seja bem vindo</p>
             <div class="opcoes">
-            <a href="index.php?modulo=ticketsController&metodo=Open">
+            <a href="index.php?modulo=ticketsController&metodo=open">
                 <input type="submit" value="Comprar Passagens"></a>
                 <a href="index.php?modulo=ticketsController&metodo=all">
                 <input type="submit" value="Minhas Passagens"></a>
@@ -30,7 +30,7 @@
         </div>
         
         <div class="direita">
-            <?php echo $conteudo ?>
+            <?php echo $content ?>
         </div>
     </div>
     <script type="text/javascript" src="./View/Templates/travardata.js"></script>

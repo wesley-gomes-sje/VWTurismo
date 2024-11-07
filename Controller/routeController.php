@@ -16,13 +16,13 @@ class routeController
         $this->routeView = new menuView();
     }
 
-    public function Open($message = '', $data = [], $cities = [])
+    public function open($message = '', $data = [], $cities = [])
     {
         $cities = $this->cityModel->all();
         $data = $this->routeModel->all();
-        $conteudo = $this->routeView;
+        $content = $this->routeView;
 
-        $conteudo->registerRoute($message, $data, $cities);
+        $content->registerRoute($message, $data, $cities);
     }
 
     public function register()
@@ -32,7 +32,7 @@ class routeController
         $distance = filter_input(INPUT_POST, 'distance', FILTER_VALIDATE_INT);
 
         if (!$origin || !$destination || !$distance) {
-            return $this->Open('Preencha todos os dados.');
+            return $this->open('Preencha todos os dados.');
         }
 
         $this->routeModel->setOrigin($origin);
@@ -41,10 +41,10 @@ class routeController
 
 
         if (!$this->routeModel->register()) {
-            return $this->Open('Erro ao registrar rota.');
+            return $this->open('Erro ao registrar rota.');
         }
 
         $cities = $this->cityModel->all();
-        $this->Open('Rota registrada com sucesso.', [], $cities);
+        $this->open('Rota registrada com sucesso.', [], $cities);
     }
 }

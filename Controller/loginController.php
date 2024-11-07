@@ -36,9 +36,9 @@ class loginController
         $menuView = new menuView();
         
         if ($_SESSION['profile'] == "user") {
-            return $menuView->telaCliente();
+            return $menuView->customer();
         } 
-        return $menuView->telaAdm();
+        return $menuView->admin();
     }
 
     public function fillLogin($message = '')

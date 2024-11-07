@@ -14,7 +14,7 @@
     <div class="container">
         <img src="./assets/logo.PNG">
         <div class="formulario">
-            <?php echo $conteudo;  ?>
+            <?php echo $content;  ?>
         </div>
     </div>
 </body>

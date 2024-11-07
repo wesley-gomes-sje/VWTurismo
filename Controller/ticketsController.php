@@ -23,18 +23,18 @@ class ticketsController
         $this->cityModel = new City();
         $this->passenger = $_SESSION['idUser'];
     }
-    public function Open($message = '', $data=[])
+    public function open($message = '', $data=[])
     {
         $cities = $this->cityModel->all();
         $vehicles = $this->vehicleModel->all();
-        $conteudo = $this->ticketView;
-        $conteudo->registerTicket($message, $cities, $vehicles,$data);
+        $content = $this->ticketView;
+        $content->registerTicket($message, $cities, $vehicles,$data);
     }
     
     
     public function show(){
         $data = $this-> ticketModel->all();
-        $this->ticketView->listTudo($data);
+        $this->ticketView->allTickets($data);
 
     }
 
@@ -46,13 +46,13 @@ class ticketsController
         $date = $this->sanitizeString($_POST['date'] ?? '');
 
         if (!$origin || !$destination || !$date) {
-            return $this->Open('Preencha todos os dados.');
+            return $this->open('Preencha todos os dados.');
         }
         
         $hasRoute = $this->routeModel->check($origin, $destination);
 
         if (!$hasRoute) {
-            return $this->Open("Não existe passagem entre as cidades selecionadas.");
+            return $this->open("Não existe passagem entre as cidades selecionadas.");
         }
         
         $this->ticketModel->setPassenger($this->passenger);
@@ -62,9 +62,9 @@ class ticketsController
         $this->ticketModel->setPrice($this->ticketModel->calculatePrice($hasRoute['distance']));
         
         if (!$this->ticketModel->register()) {
-            return $this->Open('Erro ao registrar passagem');
+            return $this->open('Erro ao registrar passagem');
         }
-        return $this->Open('Passagem comprada com sucesso.', $this->all());
+        return $this->open('Passagem comprada com sucesso.', $this->all());
         
     }
 

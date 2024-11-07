@@ -22,19 +22,19 @@
         
             <div class="opcoes">
 
-                <a href="index.php?modulo=vehicleController&metodo=Open">
+                <a href="index.php?modulo=vehicleController&metodo=open">
                     <input type="submit" value="Cadastrar Onibus"></a>
 
-                <a href="index.php?modulo=cityController&metodo=Open">
+                <a href="index.php?modulo=cityController&metodo=open">
                     <input type="submit" value="Cadastrar Cidade"> </a>
 
-                <a href="index.php?modulo=routeController&metodo=Open">
+                <a href="index.php?modulo=routeController&metodo=open">
                     <input type="submit" value="Cadastrar Trajetos"> </a>
 
                 <a href="index.php?modulo=ticketsController&metodo=show">
                     <input type="submit" value="Controle Passagens"></a>
 
-                <a href="index.php?modulo=clienteController&metodo=listCliente">
+                <a href="index.php?modulo=userController&metodo=open">
                     <input type="submit" value="Controle Clientes"> </a>
 
             </div>
@@ -48,7 +48,7 @@
 
         <div class="direita">
 
-            <?php echo $conteudo ?>
+            <?php echo $content ?>
 
         </div>
     </div>
