@@ -1,7 +1,12 @@
 <?php
+require_once './auth.php';
+
+
 class menuView
 {
-    public function __construct() {}
+    public function __construct() {
+
+    }
     //DIRECIONAMENTO PARA TELAS
     public function admin()
     {
@@ -18,6 +23,7 @@ class menuView
     //fORMULARIO DE SALVAR ONIBUS
     public function createVehicle($message, $data)
     {
+        checkAuth();
         $content = '<div class="FormEsquerda formbase">
         <form action="/vehicle/register" method="POST">
             <h1>Cadastrar</h1>
@@ -55,6 +61,7 @@ class menuView
     //fORMULARIO DE SALVAR CIDADES
     public function registerCity($message, $data)
     {
+        checkAuth();
         $content = '<div class="FormEsquerda formbase">
         <form action="/city/register" method="POST">
         <h1>Cadastrar</h1>
@@ -91,6 +98,7 @@ class menuView
     //EDITAR A CIDADE FORM ABRE
     public function editCity($data)
     {
+        checkAuth();
         $id = $data[0]['id'];
         $name = $data[0]['name'];
         $content = '<div class="FormEsquerda formbase">
@@ -110,8 +118,7 @@ class menuView
     //fORMULARIO DE SALVAR TRAJETOS
     public function registerRoute($message, $data, $cities)
     {
-
-        
+        checkAuth();
         $city = $this->listCities($cities);
         $content = '<div class="FormEsquerda formbase"style="height: auto">
             <form action="/route/register" method="POST">
@@ -153,7 +160,8 @@ class menuView
 
     //COMPRAR PASSAGEM
     public function registerTicket($message, $cities, $vehicles, $tickets)
-    {
+    { 
+        checkAuth();
         $onibus = $this->listVehicles($vehicles);
         $cidade = $this->listCities($cities);
         $content = '<div class="FormPassagem formbase" style="height: auto">
@@ -205,6 +213,7 @@ class menuView
     //LISTAGEM DE PASSAGENS CLIENTE
     public function all($tickets)
     {
+        checkAuth();
         $content = '<div class="FormDireita formbase" style="width: auto;height:auto">
         <h1>Verificar</h1>';
         $table = '<table class="tabelaVerifica" style="margin: 0px 35px;margin-bottom:20px">';
@@ -235,6 +244,7 @@ class menuView
     //LISTAR TODAS AS PASSAGENS
     public function allTickets($data)
     {
+        checkAuth();
         $content = '<div class="FormDireita formbase" style="width: auto;height:auto">
         <h1>Verificar</h1>';
         $table = '<table class="tabelaVerifica" style="margin: 0px 35px;margin-bottom:20px">';
@@ -265,6 +275,7 @@ class menuView
     //LISTAGEM DE CLIENTES
     public function custormers($data)
     {
+        checkAuth();
         $content = '<div class="FormDireita formbase">
         <h1>Listagem</h1>';
         $table = '<table>';

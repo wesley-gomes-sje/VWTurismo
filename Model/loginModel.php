@@ -24,11 +24,15 @@ class Login
     }
     public function login($email, $password)
     {
+        if(session_status() !== PHP_SESSION_ACTIVE){
+            session_start();
+        }
+        
         $connection = new connection();
         $pdo = $connection->connect();
 
         if (!$pdo) {
-            echo "Falha ao conectar ao banco de dados.";
+            error_log("Falha ao conectar ao banco de dados.");
             return false;
         }
 
@@ -43,6 +47,7 @@ class Login
             if ($sql->rowCount() > 0) {
                 $query = $sql->fetchAll(PDO::FETCH_ASSOC);
                 $hashedPassword = $query[0]['password'];
+                
                 if (password_verify($password, $hashedPassword)) {
                     $_SESSION['idUser'] = $query[0]['id'];
                     $_SESSION['email'] = $query[0]['email'];
@@ -50,10 +55,8 @@ class Login
                     $_SESSION['name'] = $query[0]['name'];
                     return true;
                 }
-                echo "Senha incorreta.";
-                return false;
             }
-            echo "Usuario não encontrado.";
+            error_log("Usuário ou senha incorretos.");
             return false;
         } catch (PDOException $e) {
             echo "Erro ao realizar o login: " . $e->getMessage();
