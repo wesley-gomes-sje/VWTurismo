@@ -17,7 +17,7 @@ class vehicleController
         return $this->vehicleView->createVehicle($message, $data);
     }
 
-    public function  createVehicle()
+    public function  register()
     {
         $brand = $this->sanitizeString($_POST['brand'] ?? '');
         $model = $this->sanitizeString($_POST['model'] ?? '');

@@ -8,20 +8,21 @@ require_once './Controller/ticketsController.php';
 require_once './View/menuView.php';
 
 
-if(isset($_GET['modulo']) && isset($_GET['metodo'])){
-    $classe = $_GET['modulo'];
-    $metodo = $_GET['metodo'];
-    $obj = new $classe();
-    $obj->$metodo();
-} else if(isset($_POST['modulo']) && isset($_POST['metodo'])){
-    $classe = $_POST['modulo'];
-    $metodo = $_POST['metodo'];
-    $obj = new $classe();
-    $obj->$metodo();
+$url = isset($_GET['url']) ? $_GET['url'] : '';
 
-}
- else{
-   
+$urlArray = explode('/', $url);
+$classe = !empty($urlArray[0]) ? $urlArray[0] . 'Controller' : 'loginController';
+$metodo = !empty($urlArray[1]) ? $urlArray[1] : 'fillLogin';
+
+if (class_exists($classe) && method_exists($classe, $metodo)) {
+    $obj = new $classe();
+    $obj->$metodo();
+    
+}  else {
     $loginController = new loginController();
     $loginController->fillLogin();
+}
+
+if ($_SERVER['REQUEST_URI'] == '/logout') {
+    require_once './logout.php';
 }

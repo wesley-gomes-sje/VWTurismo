@@ -5,12 +5,12 @@ class menuView
     //DIRECIONAMENTO PARA TELAS
     public function admin()
     {
-        $content = '<img src="./assets/logo.PNG" class="img">';
+        $content = '<img src="../assets/logo.PNG" class="img">';
         include './View/Templates/templateAdm.php';
     }
     public function customer()
     {
-        $content = '<img src="./assets/logo.PNG"> ';
+        $content = '<img src="../assets/logo.PNG"> ';
         include './View/Templates/templateCustomer.php';
     }
 
@@ -19,7 +19,7 @@ class menuView
     public function createVehicle($message, $data)
     {
         $content = '<div class="FormEsquerda formbase">
-        <form action="index.php?modulo=vehicleController&metodo=createVehicle" method="POST">
+        <form action="/vehicle/register" method="POST">
             <h1>Cadastrar</h1>
             ' . "{$message}" . '<br>
             <input type="text" name="brand" placeholder="Digite a marca do veículo" required />
@@ -56,7 +56,7 @@ class menuView
     public function registerCity($message, $data)
     {
         $content = '<div class="FormEsquerda formbase">
-        <form action="index.php?modulo=cityController&metodo=register" method="POST">
+        <form action="/city/register" method="POST">
         <h1>Cadastrar</h1>
             ' . "{$message}" . '<br>
             <input type="text" name="name" placeholder="Digite o nome da Cidade" required />
@@ -73,9 +73,9 @@ class menuView
         $content .= $table . $trH;
         foreach ($data as $item) {
             $listing = '<tr>';
-            $listing .= '<td style="width:80px">' . $item['name'] . '</td>' . '<td>' . '<a href="index.php?modulo=cityController&metodo=show&id=' . $item['id'] . '">
+            $listing .= '<td style="width:80px">' . $item['name'] . '</td>' . '<td>' . '<a href="/city/show&id=' . $item['id'] . '">
             <button style="width:100%" type="button" >Editar</button></a>' . '</td>'
-                . '<td style="width:70px">' . '<a href="index.php?modulo=cityController&metodo=delete&id=' . $item['id'] . '">
+                . '<td style="width:70px">' . '<a href="/city/delete&id=' . $item['id'] . '">
             <button style="width:100%" type="button">Excluir</button></a>' . '</td>';
             $listing .= '</tr>';
             $content .= $listing;
@@ -94,7 +94,7 @@ class menuView
         $id = $data[0]['id'];
         $name = $data[0]['name'];
         $content = '<div class="FormEsquerda formbase">
-            <form action="index.php?modulo=cityController&metodo=edit&id=' . $id . '" method="POST">
+            <form action="/city/edit&id=' . $id . '" method="POST">
             <h1>Editar</h1>
             <input type="text" name="name" value="' . $name . '" required />
             <button>Salvar</button>
@@ -114,7 +114,7 @@ class menuView
         
         $city = $this->listCities($cities);
         $content = '<div class="FormEsquerda formbase"style="height: auto">
-            <form action="index.php?modulo=routeController&metodo=register" method="POST">
+            <form action="/route/register" method="POST">
             <h1>Cadastrar</h1>
             ' . "{$message}" . '<br>
             <p style="color:white">Cidade Origem</p>
@@ -157,7 +157,7 @@ class menuView
         $onibus = $this->listVehicles($vehicles);
         $cidade = $this->listCities($cities);
         $content = '<div class="FormPassagem formbase" style="height: auto">
-        <form action="index.php?modulo=ticketsController&metodo=register" method="POST">
+        <form action="/tickets/register" method="POST">
         <h1>Comprar</h1>
         ' . "{$message}" . '<br>
         <p style="color:white">Escolha o onibus</p>

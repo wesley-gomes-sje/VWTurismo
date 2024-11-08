@@ -6,8 +6,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VWTurismo</title>
-    <link rel="stylesheet" href="./CSS/menu.css">
-    <link rel="shortcut icon" href="./assets/icone" />
+    <link rel="stylesheet" href="../css/menu.css">
+    <link rel="shortcut icon" href="../assets/icone" />
 </head>
 
 <body>
@@ -16,12 +16,12 @@
         <img style="margin-top: 50px;" src="https://img.icons8.com/wired/64/000000/bus.png"/>
         <p>Seja bem vindo</p>
             <div class="opcoes">
-            <a href="index.php?modulo=ticketsController&metodo=open">
+            <a href="/tickets/open">
                 <input type="submit" value="Comprar Passagens"></a>
-                <a href="index.php?modulo=ticketsController&metodo=all">
+                <a href="/tickets/all">
                 <input type="submit" value="Minhas Passagens"></a>
             </div>
-            <a href="./index.php">
+            <a href="/logout">
             <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px"
                     width="50" height="50"
                     viewBox="0 0 172 172"

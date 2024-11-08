@@ -5,7 +5,15 @@ require_once './View/cadUsuarioView.php';
 require_once './View/menuView.php';
 class loginController
 {
-    public function __construct() {}
+    private $loginModel;
+    private $menuView;
+    private $userView;
+    
+    public function __construct() {
+        $this->loginModel = new Login();
+        $this->menuView = new menuView();
+        $this->userView = new cadUsuarioView();
+    }
 
     public function login()
     {
@@ -19,32 +27,28 @@ class loginController
             return;
         }
 
-        $loginModel = new Login();
-        $loginModel->setEmail($email);
-        $loginModel->setPassword($password);
+        $this->loginModel->setEmail($email);
+        $this->loginModel->setPassword($password);
 
-        $getEmail = $loginModel->getEmail();
-        $getPassword = $loginModel->getPassword();
+        $getEmail = $this->loginModel->getEmail();
+        $getPassword = $this->loginModel->getPassword();
 
-        $islogin = $loginModel->login($getEmail, $getPassword);
+        $islogin = $this->loginModel->login($getEmail, $getPassword);
         if (!$islogin) {
 
             $this->fillLogin('Usuario ou senha invalido.');
             return;
         }
-
-        $menuView = new menuView();
         
         if ($_SESSION['profile'] == "user") {
-            return $menuView->customer();
+            return $this->menuView->customer();
         } 
-        return $menuView->admin();
+        return $this->menuView->admin();
     }
 
     public function fillLogin($message = '')
     {
-        $userView = new cadUsuarioView();
-        $userView->formLogin($message);
+        $this->userView->formLogin($message);
     }
 
     private function sanitizeString(?string $string): string

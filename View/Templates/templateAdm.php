@@ -7,8 +7,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VWTurismo</title>
-    <link rel="stylesheet" href="./CSS/menu.css">
-    <link rel="shortcut icon" href="./assets/icone" />
+    <link rel="stylesheet" href="../css/menu.css">
+    <link rel="shortcut icon" href="../assets/icone" />
 </head>
 
 <body>
@@ -22,23 +22,23 @@
         
             <div class="opcoes">
 
-                <a href="index.php?modulo=vehicleController&metodo=open">
-                    <input type="submit" value="Cadastrar Onibus"></a>
+                <a href="/vehicle/open">
+                    <input type="submit" value="Cadastrar Veículo"></a>
 
-                <a href="index.php?modulo=cityController&metodo=open">
+                <a href="/city/open">
                     <input type="submit" value="Cadastrar Cidade"> </a>
 
-                <a href="index.php?modulo=routeController&metodo=open">
+                <a href="/route/open">
                     <input type="submit" value="Cadastrar Trajetos"> </a>
 
-                <a href="index.php?modulo=ticketsController&metodo=show">
+                <a href="/tickets/show">
                     <input type="submit" value="Controle Passagens"></a>
 
-                <a href="index.php?modulo=userController&metodo=open">
+                <a href="/user/open">
                     <input type="submit" value="Controle Clientes"> </a>
 
             </div>
-            <a href="./index.php">
+            <a href="/logout">
             <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px"
                     width="50" height="50"
                     viewBox="0 0 172 172"
