@@ -33,6 +33,6 @@
             <?php echo $content ?>
         </div>
     </div>
-    <script type="text/javascript" src="./View/Templates/travardata.js"></script>
+    <script type="text/javascript" src="./Views/Templates/travardata.js"></script>
 </body>
 </html>
