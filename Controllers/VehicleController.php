@@ -1,7 +1,7 @@
 <?php
-require_once './Model/vehicleModel.php';
-require_once './View/menuView.php';
-class vehicleController
+require_once './Models/Vehicle.php';
+require_once './Views/menuView.php';
+class VehicleController
 {
     private $vehicleModel;
     private $vehicleView;
