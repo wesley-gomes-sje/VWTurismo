@@ -20,7 +20,7 @@ class menuView
     }
 
 
-    //fORMULARIO DE SALVAR ONIBUS
+   
     public function createVehicle($message, $data)
     {
         checkAuth();
@@ -58,7 +58,7 @@ class menuView
 
 
 
-    //fORMULARIO DE SALVAR CIDADES
+
     public function registerCity($message, $data)
     {
         checkAuth();
@@ -95,7 +95,7 @@ class menuView
 
 
 
-    //EDITAR A CIDADE FORM ABRE
+
     public function editCity($data)
     {
         checkAuth();
@@ -115,7 +115,7 @@ class menuView
 
 
 
-    //fORMULARIO DE SALVAR TRAJETOS
+    
     public function registerRoute($message, $data, $cities)
     {
         checkAuth();
@@ -158,7 +158,7 @@ class menuView
 
 
 
-    //COMPRAR PASSAGEM
+
     public function registerTicket($message, $cities, $vehicles, $tickets)
     { 
         checkAuth();
@@ -210,7 +210,6 @@ class menuView
 
 
 
-    //LISTAGEM DE PASSAGENS CLIENTE
     public function all($tickets)
     {
         checkAuth();
@@ -241,7 +240,7 @@ class menuView
 
 
 
-    //LISTAR TODAS AS PASSAGENS
+
     public function allTickets($data)
     {
         checkAuth();
@@ -272,7 +271,7 @@ class menuView
 
 
 
-    //LISTAGEM DE CLIENTES
+    
     public function custormers($data)
     {
         checkAuth();
@@ -298,7 +297,7 @@ class menuView
 
 
 
-    //LISTAGEM DAS OPÇÕES
+  
     public function listCities($data)
     {
         $city = '';
