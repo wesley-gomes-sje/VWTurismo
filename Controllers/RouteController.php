@@ -1,9 +1,9 @@
 <?php
-require_once './Model/routeModel.php';
-require_once './Model/cityModel.php';
-require_once './View/menuView.php';
+require_once './Models/Route.php';
+require_once './Models/City.php';
+require_once './Views/menuView.php';
 
-class routeController
+class RouteController
 {
     private $routeModel;
     private $cityModel;

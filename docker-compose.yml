@@ -10,6 +10,9 @@ services:
       - "8080:80"
     volumes:
       - .:/var/www/html
+    working_dir: /var/www/html/public
+    environment:
+      - APACHE_DOCUMENT_ROOT=/var/www/html/public
     env_file:
       - .env
     depends_on:
