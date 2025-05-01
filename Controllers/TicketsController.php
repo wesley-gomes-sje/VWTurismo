@@ -1,12 +1,12 @@
 <?php
 
-require_once './Model/vehicleModel.php';
-require_once './Model/ticketModel.php';
-require_once './Model/routeModel.php';
-require_once './Model/cityModel.php';
-require_once './View/menuView.php';
+require_once './Models/Vehicle.php';
+require_once './Models/Ticket.php';
+require_once './Models/Route.php';
+require_once './Models/City.php';
+require_once './Views/menuView.php';
 
-class ticketsController
+class TicketsController
 {
     private $ticketModel;
     private $routeModel;
@@ -16,7 +16,7 @@ class ticketsController
     private $passenger;
     public function __construct()
     { 
-        checkAuth();
+        
         $this->vehicleModel = new Vehicle();
         $this->ticketView = new menuView();
         $this->ticketModel = new Ticket();

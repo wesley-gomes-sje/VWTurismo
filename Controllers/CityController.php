@@ -1,7 +1,7 @@
 <?php
-require_once './View/menuView.php';
-require_once './Model/cityModel.php';
-class cityController
+require_once './Views/menuView.php';
+require_once './Models/City.php';
+class CityController
 {
     private $cityModel;
     private $cityView;
