@@ -17,12 +17,12 @@
         <tr>
             <td style="width:80px"><?= $item['name'] ?></td>
             <td>
-                <a href="/city/show&id=<?= $item['id'] ?>">
+                <a href="/city/show?id=<?= $item['id'] ?>">
                     <button style="width:100%" type="button">Editar</button>
                 </a>
             </td>
             <td style="width:70px">
-                <a href="/city/delete&id=<?= $item['id'] ?>">
+                <a href="/city/delete?id=<?= $item['id'] ?>">
                     <button style="width:100%" type="button">Excluir</button>
                 </a>
             </td>

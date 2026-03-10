@@ -1,4 +1,4 @@
-<form action='/login/login' method='POST'>
+<form action='/login' method='POST'>
     <h1>Login</h1><br>
     <?= $message ?>
     <input type='text' name='email' id='email' placeholder='Login' required><br>
