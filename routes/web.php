@@ -3,45 +3,42 @@
 /**
  * Mapeamento explícito de rotas da aplicação.
  *
- * Formato: $router->add(MÉTODO, '/uri', [Classe::class, 'método']);
+ * Rotas públicas: registradas diretamente.
+ * Rotas protegidas: envolvidas com AuthMiddleware::protect().
  *
  * A variável $router é criada em index.php antes de incluir este arquivo.
  */
 
-// --- Autenticação ---
-$router->add('GET',  '/login',             [\App\Controller\loginController::class, 'fillLogin']);
-$router->add('POST', '/login',             [\App\Controller\loginController::class, 'login']);
+use App\Middleware\AuthMiddleware;
 
-// --- Cadastro de usuário (público) ---
-$router->add('GET',  '/user/register',     [\App\Controller\userController::class,  'fillFields']);
-$router->add('POST', '/user/register',     [\App\Controller\userController::class,  'register']);
+$auth = fn (array $handler) => AuthMiddleware::protect($handler);
 
-// --- Clientes (admin) ---
-$router->add('GET',  '/user/open',         [\App\Controller\userController::class,  'open']);
+// --- Rotas públicas ---
+$router->add('GET',  '/login',         [\App\Controller\loginController::class, 'fillLogin']);
+$router->add('POST', '/login',         [\App\Controller\loginController::class, 'login']);
+$router->add('GET',  '/user/register', [\App\Controller\userController::class,  'fillFields']);
+$router->add('POST', '/user/register', [\App\Controller\userController::class,  'register']);
 
-// --- Cidades ---
-$router->add('GET',  '/city/open',         [\App\Controller\cityController::class,  'open']);
-$router->add('POST', '/city/register',     [\App\Controller\cityController::class,  'register']);
-$router->add('GET',  '/city/delete',       [\App\Controller\cityController::class,  'delete']);
-$router->add('GET',  '/city/show',         [\App\Controller\cityController::class,  'show']);
-$router->add('POST', '/city/edit',         [\App\Controller\cityController::class,  'edit']);
+// --- Rotas protegidas — admin ---
+$router->add('GET',  '/user/open',        $auth([\App\Controller\userController::class,    'open']));
+$router->add('GET',  '/city/open',        $auth([\App\Controller\cityController::class,    'open']));
+$router->add('POST', '/city/register',    $auth([\App\Controller\cityController::class,    'register']));
+$router->add('GET',  '/city/delete',      $auth([\App\Controller\cityController::class,    'delete']));
+$router->add('GET',  '/city/show',        $auth([\App\Controller\cityController::class,    'show']));
+$router->add('POST', '/city/edit',        $auth([\App\Controller\cityController::class,    'edit']));
+$router->add('GET',  '/vehicle/open',     $auth([\App\Controller\vehicleController::class, 'open']));
+$router->add('POST', '/vehicle/register', $auth([\App\Controller\vehicleController::class, 'register']));
+$router->add('GET',  '/route/open',       $auth([\App\Controller\routeController::class,   'open']));
+$router->add('POST', '/route/register',   $auth([\App\Controller\routeController::class,   'register']));
 
-// --- Veículos ---
-$router->add('GET',  '/vehicle/open',      [\App\Controller\vehicleController::class, 'open']);
-$router->add('POST', '/vehicle/register',  [\App\Controller\vehicleController::class, 'register']);
-
-// --- Rotas de ônibus ---
-$router->add('GET',  '/route/open',        [\App\Controller\routeController::class, 'open']);
-$router->add('POST', '/route/register',    [\App\Controller\routeController::class, 'register']);
-
-// --- Passagens ---
-$router->add('GET',  '/tickets/open',      [\App\Controller\ticketsController::class, 'open']);
-$router->add('POST', '/tickets/register',  [\App\Controller\ticketsController::class, 'register']);
-$router->add('GET',  '/tickets/show',      [\App\Controller\ticketsController::class, 'show']);
-$router->add('GET',  '/tickets/all',       [\App\Controller\ticketsController::class, 'all']);
+// --- Rotas protegidas — cliente ---
+$router->add('GET',  '/tickets/open',     $auth([\App\Controller\ticketsController::class, 'open']));
+$router->add('POST', '/tickets/register', $auth([\App\Controller\ticketsController::class, 'register']));
+$router->add('GET',  '/tickets/show',     $auth([\App\Controller\ticketsController::class, 'show']));
+$router->add('GET',  '/tickets/all',      $auth([\App\Controller\ticketsController::class, 'all']));
 
 // --- Logout ---
-$router->add('GET',  '/logout', function () {
+$router->add('GET', '/logout', function () {
     if (session_status() !== PHP_SESSION_ACTIVE) {
         session_start();
     }
