@@ -7,6 +7,8 @@ use App\View\menuView;
 
 class vehicleController
 {
+    use SanitizeTrait;
+
     private $vehicleModel;
     private $vehicleView;
 
@@ -45,10 +47,5 @@ class vehicleController
         }
 
         return $this->open('Veículo registrado com sucesso.');
-    }
-
-    private function sanitizeString(?string $string): string
-    {
-        return htmlspecialchars(strip_tags($string ?? ''), ENT_QUOTES, 'UTF-8');
     }
 }

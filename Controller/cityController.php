@@ -7,6 +7,8 @@ use App\View\menuView;
 
 class cityController
 {
+    use SanitizeTrait;
+
     private $cityModel;
     private $cityView;
 
@@ -83,8 +85,4 @@ class cityController
         return $this->open('Cidade editada com sucesso!');
     }
 
-    private function sanitizeString($string): string
-    {
-        return htmlspecialchars($string, ENT_QUOTES, 'UTF-8');
-    }
 }

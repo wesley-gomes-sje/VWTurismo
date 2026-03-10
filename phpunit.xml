@@ -21,6 +21,7 @@
             <directory suffix=".php">Model</directory>
             <directory suffix=".php">middlewares</directory>
             <file>Router.php</file>
+            <directory suffix=".php">Controller</directory>
         </include>
     </source>
 

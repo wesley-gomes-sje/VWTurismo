@@ -10,6 +10,8 @@ use App\View\menuView;
 
 class ticketsController
 {
+    use SanitizeTrait;
+
     private $ticketModel;
     private $routeModel;
     private $ticketView;
@@ -74,10 +76,5 @@ class ticketsController
     {
         $tickets = $this->ticketModel->showTicketsByPassenger($this->passenger);
         return $this->ticketView->all($tickets);
-    }
-
-    private function sanitizeString(?string $string): string
-    {
-        return htmlspecialchars(strip_tags($string ?? ''), ENT_QUOTES, 'UTF-8');
     }
 }
