@@ -12,7 +12,7 @@ use PHPUnit\Framework\TestCase;
 
 class LoginTest extends TestCase
 {
-    // --- login() ---
+    // --- login() retorna false ---
 
     #[RunInSeparateProcess]
     #[PreserveGlobalState(false)]
@@ -26,84 +26,27 @@ class LoginTest extends TestCase
         $pdo = $this->createMock(PDO::class);
         $pdo->method('prepare')->willReturn($stmt);
 
-        $login = new Login($pdo);
-
-        $this->assertFalse($login->login('naoexiste@example.com', 'senha123'));
+        $this->assertFalse((new Login($pdo))->login('x@x.com', 'wrong'));
     }
 
     #[RunInSeparateProcess]
     #[PreserveGlobalState(false)]
     public function testLoginReturnsFalseWhenPasswordIsWrong(): void
     {
-        $hashedCorrect = password_hash('senhaCorreta', PASSWORD_BCRYPT);
+        $hashed = password_hash('correta', PASSWORD_BCRYPT);
 
         $stmt = $this->createMock(PDOStatement::class);
         $stmt->method('bindValue')->willReturn(true);
         $stmt->method('execute')->willReturn(true);
         $stmt->method('rowCount')->willReturn(1);
         $stmt->method('fetchAll')->willReturn([
-            ['id' => 1, 'email' => 'user@example.com', 'password' => $hashedCorrect,
-             'profile' => 'user', 'name' => 'Alice'],
+            ['id' => 1, 'email' => 'u@u.com', 'password' => $hashed, 'profile' => 'user', 'name' => 'Alice'],
         ]);
 
         $pdo = $this->createMock(PDO::class);
         $pdo->method('prepare')->willReturn($stmt);
 
-        $login = new Login($pdo);
-
-        $this->assertFalse($login->login('user@example.com', 'senhaErrada'));
-    }
-
-    #[RunInSeparateProcess]
-    #[PreserveGlobalState(false)]
-    public function testLoginReturnsTrueWithValidCredentials(): void
-    {
-        $password       = 'senha_correta';
-        $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
-
-        $stmt = $this->createMock(PDOStatement::class);
-        $stmt->method('bindValue')->willReturn(true);
-        $stmt->method('execute')->willReturn(true);
-        $stmt->method('rowCount')->willReturn(1);
-        $stmt->method('fetchAll')->willReturn([
-            ['id' => 1, 'email' => 'user@example.com', 'password' => $hashedPassword,
-             'profile' => 'user', 'name' => 'Alice'],
-        ]);
-
-        $pdo = $this->createMock(PDO::class);
-        $pdo->method('prepare')->willReturn($stmt);
-
-        $login  = new Login($pdo);
-        $result = $login->login('user@example.com', $password);
-
-        $this->assertTrue($result);
-    }
-
-    #[RunInSeparateProcess]
-    #[PreserveGlobalState(false)]
-    public function testLoginSetsSessionOnSuccess(): void
-    {
-        $password       = 'senha_correta';
-        $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
-
-        $stmt = $this->createMock(PDOStatement::class);
-        $stmt->method('bindValue')->willReturn(true);
-        $stmt->method('execute')->willReturn(true);
-        $stmt->method('rowCount')->willReturn(1);
-        $stmt->method('fetchAll')->willReturn([
-            ['id' => 42, 'email' => 'user@example.com', 'password' => $hashedPassword,
-             'profile' => 'admin', 'name' => 'Alice'],
-        ]);
-
-        $pdo = $this->createMock(PDO::class);
-        $pdo->method('prepare')->willReturn($stmt);
-
-        $login = new Login($pdo);
-        $login->login('user@example.com', $password);
-
-        $this->assertSame(42,      $_SESSION['idUser']);
-        $this->assertSame('admin', $_SESSION['profile']);
-        $this->assertSame('Alice', $_SESSION['name']);
+        $this->assertFalse((new Login($pdo))->login('u@u.com', 'errada'));
     }
 
     #[RunInSeparateProcess]
@@ -113,28 +56,73 @@ class LoginTest extends TestCase
         $pdo = $this->createMock(PDO::class);
         $pdo->method('prepare')->willThrowException(new PDOException('fail'));
 
-        $login = new Login($pdo);
+        $this->assertFalse((new Login($pdo))->login('u@u.com', 'senha'));
+    }
 
-        $this->assertFalse($login->login('user@example.com', 'senha'));
+    // --- login() retorna array com dados do usuário ---
+
+    #[RunInSeparateProcess]
+    #[PreserveGlobalState(false)]
+    public function testLoginReturnsUserArrayOnSuccess(): void
+    {
+        $password = 'senha_correta';
+        $hashed   = password_hash($password, PASSWORD_BCRYPT);
+        $userData = ['id' => 42, 'email' => 'u@u.com', 'password' => $hashed, 'profile' => 'admin', 'name' => 'Alice'];
+
+        $stmt = $this->createMock(PDOStatement::class);
+        $stmt->method('bindValue')->willReturn(true);
+        $stmt->method('execute')->willReturn(true);
+        $stmt->method('rowCount')->willReturn(1);
+        $stmt->method('fetchAll')->willReturn([$userData]);
+
+        $pdo = $this->createMock(PDO::class);
+        $pdo->method('prepare')->willReturn($stmt);
+
+        $result = (new Login($pdo))->login('u@u.com', $password);
+
+        $this->assertIsArray($result);
+        $this->assertSame(42,      $result['id']);
+        $this->assertSame('admin', $result['profile']);
+        $this->assertSame('Alice', $result['name']);
+    }
+
+    #[RunInSeparateProcess]
+    #[PreserveGlobalState(false)]
+    public function testLoginDoesNotSetSessionDirectly(): void
+    {
+        $password = 'senha_correta';
+        $hashed   = password_hash($password, PASSWORD_BCRYPT);
+
+        $stmt = $this->createMock(PDOStatement::class);
+        $stmt->method('bindValue')->willReturn(true);
+        $stmt->method('execute')->willReturn(true);
+        $stmt->method('rowCount')->willReturn(1);
+        $stmt->method('fetchAll')->willReturn([
+            ['id' => 7, 'email' => 'u@u.com', 'password' => $hashed, 'profile' => 'user', 'name' => 'Bob'],
+        ]);
+
+        $pdo = $this->createMock(PDO::class);
+        $pdo->method('prepare')->willReturn($stmt);
+
+        (new Login($pdo))->login('u@u.com', $password);
+
+        // Model não deve mais tocar em $_SESSION
+        $this->assertArrayNotHasKey('idUser', $_SESSION ?? []);
     }
 
     // --- getters / setters ---
 
     public function testSetAndGetEmail(): void
     {
-        $pdo   = $this->createMock(PDO::class);
-        $login = new Login($pdo);
+        $login = new Login($this->createMock(PDO::class));
         $login->setEmail('test@example.com');
-
         $this->assertSame('test@example.com', $login->getEmail());
     }
 
     public function testSetAndGetPassword(): void
     {
-        $pdo   = $this->createMock(PDO::class);
-        $login = new Login($pdo);
+        $login = new Login($this->createMock(PDO::class));
         $login->setPassword('secret');
-
         $this->assertSame('secret', $login->getPassword());
     }
 }

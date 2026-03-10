@@ -23,35 +23,31 @@ class Login
     public function getPassword()           { return $this->password; }
     public function setPassword($password)  { $this->password = $password; }
 
+    /**
+     * Verifica credenciais e retorna os dados do usuário ou false.
+     * Não gerencia sessão — responsabilidade do controller.
+     *
+     * @return array|false  Array com id, email, profile, name ou false se inválido.
+     */
     public function login($email, $password)
     {
-        if (session_status() !== PHP_SESSION_ACTIVE) {
-            session_start();
-        }
-
         try {
-            $sql = $this->pdo->prepare("SELECT * FROM users WHERE email = :email;");
-            $sql->bindValue(":email", $email);
+            $sql = $this->pdo->prepare('SELECT * FROM users WHERE email = :email;');
+            $sql->bindValue(':email', $email);
             $sql->execute();
 
             if ($sql->rowCount() > 0) {
-                $query          = $sql->fetchAll(PDO::FETCH_ASSOC);
-                $hashedPassword = $query[0]['password'];
+                $user = $sql->fetchAll(PDO::FETCH_ASSOC)[0];
 
-                if (password_verify($password, $hashedPassword)) {
-                    session_regenerate_id(true);
-                    $_SESSION['idUser']  = $query[0]['id'];
-                    $_SESSION['email']   = $query[0]['email'];
-                    $_SESSION['profile'] = $query[0]['profile'];
-                    $_SESSION['name']    = $query[0]['name'];
-                    return true;
+                if (password_verify($password, $user['password'])) {
+                    return $user;
                 }
             }
 
-            error_log("Usuário ou senha incorretos.");
+            error_log('Login::login — usuário ou senha incorretos.');
             return false;
         } catch (PDOException $e) {
-            error_log("Erro ao realizar o login: " . $e->getMessage());
+            error_log('Login::login — ' . $e->getMessage());
             return false;
         }
     }

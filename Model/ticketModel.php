@@ -51,15 +51,9 @@ class Ticket
             $pre->bindValue(3, $this->vehicle);
             $pre->bindValue(4, $this->price);
             $pre->bindValue(5, $this->date);
-
-            if ($pre->execute()) {
-                return true;
-            }
-
-            error_log("Erro ao registrar passagem: " . implode(', ', $pre->errorInfo()));
-            return false;
+            return $pre->execute() ? true : false;
         } catch (PDOException $e) {
-            error_log("Erro ao registrar passagem: " . $e->getMessage());
+            error_log('Ticket::register — ' . $e->getMessage());
             return false;
         }
     }
@@ -67,24 +61,19 @@ class Ticket
     public function show($id)
     {
         try {
-            $sql = 'SELECT t.date AS date, t.price AS price, co.name AS origin, cd.name AS destination, r.distance AS distance
+            $sql = 'SELECT t.date, t.price, co.name AS origin, cd.name AS destination, r.distance
                     FROM tickets t
-                    INNER JOIN routes r ON t.route = r.id
+                    INNER JOIN routes r  ON t.route = r.id
                     INNER JOIN cities co ON r.origin = co.id
                     INNER JOIN cities cd ON r.destination = cd.id
-                    INNER JOIN users u ON t.passenger = u.id
+                    INNER JOIN users u   ON t.passenger = u.id
                     WHERE t.id = ?;';
             $pre = $this->pdo->prepare($sql);
             $pre->bindValue(1, $id);
-
-            if ($pre->execute()) {
-                return $pre->fetch(PDO::FETCH_ASSOC);
-            }
-
-            error_log("Erro ao buscar passagem: " . implode(', ', $pre->errorInfo()));
-            return false;
+            $pre->execute();
+            return $pre->fetch(PDO::FETCH_ASSOC) ?: false;
         } catch (PDOException $e) {
-            error_log("Erro ao buscar passagem: " . $e->getMessage());
+            error_log('Ticket::show — ' . $e->getMessage());
             return false;
         }
     }
@@ -92,24 +81,19 @@ class Ticket
     public function all()
     {
         try {
-            $sql  = 'SELECT u.name AS name, t.date AS date, t.price AS price,
-                           co.name AS origin, cd.name AS destination, r.distance AS distance,
-                           v.brand AS brand, v.model AS model, v.plate AS plate
+            $sql = 'SELECT u.name, t.date, t.price, co.name AS origin, cd.name AS destination,
+                           r.distance, v.brand, v.model, v.plate
                     FROM tickets t
-                    INNER JOIN routes r ON t.route = r.id
-                    INNER JOIN cities co ON r.origin = co.id
-                    INNER JOIN cities cd ON r.destination = cd.id
-                    INNER JOIN users u ON t.passenger = u.id
+                    INNER JOIN routes r   ON t.route = r.id
+                    INNER JOIN cities co  ON r.origin = co.id
+                    INNER JOIN cities cd  ON r.destination = cd.id
+                    INNER JOIN users u    ON t.passenger = u.id
                     INNER JOIN vehicles v ON t.vehicle = v.id
                     ORDER BY t.date DESC;';
             $data = $this->pdo->query($sql);
-
-            if ($data) {
-                return $data->fetchAll(PDO::FETCH_ASSOC);
-            }
-            return [];
+            return $data ? $data->fetchAll(PDO::FETCH_ASSOC) : [];
         } catch (PDOException $e) {
-            error_log("Erro ao listar passagens: " . $e->getMessage());
+            error_log('Ticket::all — ' . $e->getMessage());
             return [];
         }
     }
@@ -117,31 +101,26 @@ class Ticket
     public function showTicketsByPassenger($passenger)
     {
         try {
-            $sql = 'SELECT t.date AS date, t.price AS price, v.brand AS brand, v.model AS model,
-                           v.plate AS plate, co.name AS origin, cd.name AS destination, r.distance AS distance
+            $sql = 'SELECT t.date, t.price, v.brand, v.model, v.plate,
+                           co.name AS origin, cd.name AS destination, r.distance
                     FROM tickets t
-                    INNER JOIN routes r ON t.route = r.id
-                    INNER JOIN cities co ON r.origin = co.id
-                    INNER JOIN cities cd ON r.destination = cd.id
-                    INNER JOIN users u ON t.passenger = u.id
+                    INNER JOIN routes r   ON t.route = r.id
+                    INNER JOIN cities co  ON r.origin = co.id
+                    INNER JOIN cities cd  ON r.destination = cd.id
+                    INNER JOIN users u    ON t.passenger = u.id
                     INNER JOIN vehicles v ON t.vehicle = v.id
                     WHERE t.passenger = ?;';
             $pre = $this->pdo->prepare($sql);
             $pre->bindValue(1, $passenger);
-
-            if ($pre->execute()) {
-                return $pre->fetchAll(PDO::FETCH_ASSOC);
-            }
-
-            error_log("Erro ao buscar passagens do passageiro: " . implode(', ', $pre->errorInfo()));
-            return false;
+            $pre->execute();
+            return $pre->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
-            error_log("Erro ao buscar passagens do passageiro: " . $e->getMessage());
+            error_log('Ticket::showTicketsByPassenger — ' . $e->getMessage());
             return false;
         }
     }
 
-    public function calculatePrice($distance)
+    public function calculatePrice(float $distance): float
     {
         return $distance * 0.5;
     }

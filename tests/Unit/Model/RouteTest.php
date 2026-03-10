@@ -2,41 +2,36 @@
 
 namespace Tests\Unit\Model;
 
+use App\Model\Route;
 use PDO;
 use PDOException;
 use PDOStatement;
 use PHPUnit\Framework\TestCase;
-use App\Model\Route;
 
 class RouteTest extends TestCase
 {
-    private function makeSuccessStatement(): PDOStatement
+    private function makeStmt(bool $executes = true, mixed $fetchReturn = false): PDOStatement
     {
         $stmt = $this->createMock(PDOStatement::class);
         $stmt->method('bindValue')->willReturn(true);
-        $stmt->method('execute')->willReturn(true);
+        $stmt->method('execute')->willReturn($executes);
+        $stmt->method('fetch')->willReturn($fetchReturn);
+        $stmt->method('fetchAll')->willReturn([]);
         return $stmt;
     }
 
-    private function makeFailStatement(): PDOStatement
+    private function makePdo(PDOStatement $stmt): PDO
     {
-        $stmt = $this->createMock(PDOStatement::class);
-        $stmt->method('bindValue')->willReturn(true);
-        $stmt->method('execute')->willReturn(false);
-        $stmt->method('errorInfo')->willReturn(['HY000', 1, 'DB error']);
-        return $stmt;
+        $pdo = $this->createMock(PDO::class);
+        $pdo->method('prepare')->willReturn($stmt);
+        return $pdo;
     }
 
     // --- register() ---
 
     public function testRegisterReturnsTrueOnSuccess(): void
     {
-        $stmt = $this->makeSuccessStatement();
-
-        $pdo = $this->createMock(PDO::class);
-        $pdo->method('prepare')->willReturn($stmt);
-
-        $route = new Route($pdo);
+        $route = new Route($this->makePdo($this->makeStmt(true)));
         $route->setOrigin(1);
         $route->setDestination(2);
         $route->setDistance(300);
@@ -46,115 +41,77 @@ class RouteTest extends TestCase
 
     public function testRegisterReturnsFalseWhenExecuteFails(): void
     {
-        $stmt = $this->makeFailStatement();
-
-        $pdo = $this->createMock(PDO::class);
-        $pdo->method('prepare')->willReturn($stmt);
-
-        $route = new Route($pdo);
-        $route->setOrigin(1);
-        $route->setDestination(2);
-        $route->setDistance(300);
-
+        $route = new Route($this->makePdo($this->makeStmt(false)));
         $this->assertFalse($route->register());
     }
 
-    public function testRegisterReturnsFalseOnPdoException(): void
+    public function testRegisterReturnsFalseOnException(): void
     {
         $pdo = $this->createMock(PDO::class);
         $pdo->method('prepare')->willThrowException(new PDOException('fail'));
-
-        $route = new Route($pdo);
-        $route->setOrigin(1);
-        $route->setDestination(2);
-        $route->setDistance(300);
-
-        $this->assertFalse($route->register());
+        $this->assertFalse((new Route($pdo))->register());
     }
 
     // --- all() ---
 
-    public function testAllReturnsArrayOfRoutes(): void
+    public function testAllReturnsData(): void
     {
-        $expected = [
-            ['origin' => 'São Paulo', 'destination' => 'Campinas', 'distance' => 100],
-        ];
-
+        $rows = [['origin' => 'SP', 'destination' => 'RJ', 'distance' => 400]];
         $stmt = $this->createMock(PDOStatement::class);
-        $stmt->method('fetchAll')->willReturn($expected);
+        $stmt->method('fetchAll')->willReturn($rows);
 
         $pdo = $this->createMock(PDO::class);
         $pdo->method('query')->willReturn($stmt);
 
-        $route = new Route($pdo);
-
-        $this->assertSame($expected, $route->all());
+        $this->assertSame($rows, (new Route($pdo))->all());
     }
 
-    public function testAllReturnsEmptyArrayOnPdoException(): void
+    public function testAllReturnsFalseOnException(): void
     {
         $pdo = $this->createMock(PDO::class);
         $pdo->method('query')->willThrowException(new PDOException('fail'));
-
-        $route = new Route($pdo);
-
-        $this->assertSame([], $route->all());
+        $this->assertFalse((new Route($pdo))->all());
     }
 
     // --- check() ---
 
-    public function testCheckReturnsRouteDataWhenExists(): void
+    public function testCheckReturnsRouteWhenFound(): void
     {
-        $expected = ['id' => 5, 'distance' => 300];
+        $row  = ['id' => 1, 'distance' => 300];
+        $stmt = $this->makeStmt(true, $row);
+        $route = new Route($this->makePdo($stmt));
 
-        $stmt = $this->createMock(PDOStatement::class);
-        $stmt->method('bindValue')->willReturn(true);
-        $stmt->method('execute')->willReturn(true);
-        $stmt->method('fetch')->willReturn($expected);
-
-        $pdo = $this->createMock(PDO::class);
-        $pdo->method('prepare')->willReturn($stmt);
-
-        $route  = new Route($pdo);
-        $result = $route->check(1, 2);
-
-        $this->assertSame($expected, $result);
+        $this->assertSame($row, $route->check(1, 2));
     }
 
-    public function testCheckReturnsFalseWhenRouteDoesNotExist(): void
+    public function testCheckReturnsFalseWhenNotFound(): void
     {
-        $stmt = $this->createMock(PDOStatement::class);
-        $stmt->method('bindValue')->willReturn(true);
-        $stmt->method('execute')->willReturn(true);
-        $stmt->method('fetch')->willReturn(false);
+        $stmt  = $this->makeStmt(true, false);
+        $route = new Route($this->makePdo($stmt));
 
-        $pdo = $this->createMock(PDO::class);
-        $pdo->method('prepare')->willReturn($stmt);
-
-        $route  = new Route($pdo);
-        $result = $route->check(1, 99);
-
-        $this->assertFalse($result);
+        $this->assertFalse($route->check(1, 99));
     }
 
-    public function testCheckReturnsFalseOnPdoException(): void
+    public function testCheckReturnsFalseOnException(): void
     {
         $pdo = $this->createMock(PDO::class);
         $pdo->method('prepare')->willThrowException(new PDOException('fail'));
-
-        $route = new Route($pdo);
-
-        $this->assertFalse($route->check(1, 2));
+        $this->assertFalse((new Route($pdo))->check(1, 2));
     }
 
     // --- getters / setters ---
 
-    public function testSetAndGetDistance(): void
+    public function testGettersAndSetters(): void
     {
-        $pdo   = $this->createMock(PDO::class);
-        $route = new Route($pdo);
+        $route = new Route($this->createMock(PDO::class));
+        $route->setId(1);
+        $route->setOrigin(2);
+        $route->setDestination(3);
         $route->setDistance(500);
 
+        $this->assertSame(1,   $route->getId());
+        $this->assertSame(2,   $route->getOrigin());
+        $this->assertSame(3,   $route->getDestination());
         $this->assertSame(500, $route->getDistance());
     }
 }

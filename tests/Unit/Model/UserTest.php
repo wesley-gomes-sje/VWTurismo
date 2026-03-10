@@ -2,172 +2,108 @@
 
 namespace Tests\Unit\Model;
 
+use App\Model\User;
 use PDO;
 use PDOException;
 use PDOStatement;
 use PHPUnit\Framework\TestCase;
-use App\Model\User;
 
 class UserTest extends TestCase
 {
-    private function makeSuccessStatement(): PDOStatement
+    private function makeStmt(bool $executes = true, int $rows = 0, array $data = [], mixed $fetchReturn = false): PDOStatement
     {
         $stmt = $this->createMock(PDOStatement::class);
         $stmt->method('bindValue')->willReturn(true);
-        $stmt->method('execute')->willReturn(true);
+        $stmt->method('execute')->willReturn($executes);
+        $stmt->method('rowCount')->willReturn($rows);
+        $stmt->method('fetchAll')->willReturn($data);
+        $stmt->method('fetch')->willReturn($fetchReturn);
         return $stmt;
     }
 
-    private function makeFailStatement(): PDOStatement
+    private function makePdo(PDOStatement $stmt): PDO
     {
-        $stmt = $this->createMock(PDOStatement::class);
-        $stmt->method('bindValue')->willReturn(true);
-        $stmt->method('execute')->willReturn(false);
-        $stmt->method('errorInfo')->willReturn(['HY000', 1, 'DB error']);
-        return $stmt;
+        $pdo = $this->createMock(PDO::class);
+        $pdo->method('prepare')->willReturn($stmt);
+        return $pdo;
     }
 
     // --- register() ---
 
     public function testRegisterReturnsTrueOnSuccess(): void
     {
-        $stmt = $this->makeSuccessStatement();
+        $u = new User(null, $this->makePdo($this->makeStmt(true)));
+        $u->setName('Alice');
+        $u->setEmail('alice@example.com');
+        $u->setPassword('hash');
 
-        $pdo = $this->createMock(PDO::class);
-        $pdo->method('prepare')->willReturn($stmt);
-
-        $user = new User(null, $pdo);
-        $user->setName('João Silva');
-        $user->setEmail('joao@example.com');
-        $user->setPassword('hashed_password');
-
-        $this->assertTrue($user->register());
+        $this->assertTrue($u->register());
     }
 
     public function testRegisterReturnsFalseWhenExecuteFails(): void
     {
-        $stmt = $this->makeFailStatement();
-
-        $pdo = $this->createMock(PDO::class);
-        $pdo->method('prepare')->willReturn($stmt);
-
-        $user = new User(null, $pdo);
-        $user->setName('João');
-        $user->setEmail('joao@example.com');
-        $user->setPassword('hash');
-
-        $this->assertFalse($user->register());
+        $u = new User(null, $this->makePdo($this->makeStmt(false)));
+        $this->assertFalse($u->register());
     }
 
-    public function testRegisterReturnsFalseOnPdoException(): void
+    public function testRegisterReturnsFalseOnException(): void
     {
         $pdo = $this->createMock(PDO::class);
         $pdo->method('prepare')->willThrowException(new PDOException('fail'));
-
-        $user = new User(null, $pdo);
-        $user->setName('João');
-        $user->setEmail('joao@example.com');
-        $user->setPassword('hash');
-
-        $this->assertFalse($user->register());
-    }
-
-    // --- all() ---
-
-    public function testAllReturnsArrayOfUsers(): void
-    {
-        $expected = [
-            ['name' => 'Alice', 'email' => 'alice@example.com'],
-            ['name' => 'Bob',   'email' => 'bob@example.com'],
-        ];
-
-        $stmt = $this->createMock(PDOStatement::class);
-        $stmt->method('fetchAll')->willReturn($expected);
-
-        $pdo = $this->createMock(PDO::class);
-        $pdo->method('query')->willReturn($stmt);
-
-        $user = new User(null, $pdo);
-
-        $this->assertSame($expected, $user->all());
-    }
-
-    public function testAllReturnsEmptyArrayOnPdoException(): void
-    {
-        $pdo = $this->createMock(PDO::class);
-        $pdo->method('query')->willThrowException(new PDOException('fail'));
-
-        $user = new User(null, $pdo);
-
-        $this->assertSame([], $user->all());
+        $this->assertFalse((new User(null, $pdo))->register());
     }
 
     // --- show() ---
 
-    public function testShowReturnsTrueWhenEmailExists(): void
+    public function testShowReturnsTrueWhenUserExists(): void
     {
-        $stmt = $this->createMock(PDOStatement::class);
-        $stmt->method('bindValue')->willReturn(true);
-        $stmt->method('execute')->willReturn(true);
-        $stmt->method('rowCount')->willReturn(1);
-
-        $pdo = $this->createMock(PDO::class);
-        $pdo->method('prepare')->willReturn($stmt);
-
-        $user = new User(null, $pdo);
-
-        $this->assertTrue($user->show('alice@example.com'));
+        $u = new User(null, $this->makePdo($this->makeStmt(true, 1)));
+        $this->assertTrue($u->show('alice@example.com'));
     }
 
-    public function testShowReturnsFalseWhenEmailNotFound(): void
+    public function testShowReturnsFalseWhenNotFound(): void
     {
-        $stmt = $this->createMock(PDOStatement::class);
-        $stmt->method('bindValue')->willReturn(true);
-        $stmt->method('execute')->willReturn(true);
-        $stmt->method('rowCount')->willReturn(0);
-
-        $pdo = $this->createMock(PDO::class);
-        $pdo->method('prepare')->willReturn($stmt);
-
-        $user = new User(null, $pdo);
-
-        $this->assertFalse($user->show('naoexiste@example.com'));
+        $u = new User(null, $this->makePdo($this->makeStmt(true, 0)));
+        $this->assertFalse($u->show('nope@example.com'));
     }
 
-    // --- showCustomers() ---
+    // --- all() ---
 
-    public function testShowCustomersReturnsOnlyUsers(): void
+    public function testAllReturnsData(): void
     {
-        $expected = [['name' => 'Cliente', 'email' => 'cliente@example.com']];
-
+        $rows = [['name' => 'Alice', 'email' => 'alice@example.com']];
         $stmt = $this->createMock(PDOStatement::class);
-        $stmt->method('fetchAll')->willReturn($expected);
+        $stmt->method('fetchAll')->willReturn($rows);
 
         $pdo = $this->createMock(PDO::class);
         $pdo->method('query')->willReturn($stmt);
 
-        $user = new User(null, $pdo);
+        $this->assertSame($rows, (new User(null, $pdo))->all());
+    }
 
-        $this->assertSame($expected, $user->showCustomers());
+    public function testAllReturnsEmptyArrayOnException(): void
+    {
+        $pdo = $this->createMock(PDO::class);
+        $pdo->method('query')->willThrowException(new PDOException('fail'));
+
+        $result = (new User(null, $pdo))->all();
+        $this->assertIsArray($result);
+        $this->assertEmpty($result);
     }
 
     // --- getters / setters ---
 
-    public function testSetAndGetName(): void
+    public function testGettersAndSetters(): void
     {
-        $pdo  = $this->createMock(PDO::class);
-        $user = new User(null, $pdo);
-        $user->setName('Maria');
+        $u = new User(null, $this->createMock(PDO::class));
+        $u->setId(1);
+        $u->setName('Bob');
+        $u->setEmail('bob@example.com');
+        $u->setPassword('secret');
 
-        $this->assertSame('Maria', $user->getName());
-    }
-
-    public function testSetAndGetEmail(): void
-    {
-        $pdo  = $this->createMock(PDO::class);
-        $user = new User(null, $pdo);
-        $user->setEmail('maria@example.com');
-
-        $this->assertSame('maria@example.com', $user->getEmail());
+        $this->assertSame(1,                 $u->getId());
+        $this->assertSame('Bob',             $u->getName());
+        $this->assertSame('bob@example.com', $u->getEmail());
+        $this->assertSame('secret',          $u->getPassword());
     }
 }

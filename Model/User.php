@@ -23,11 +23,11 @@ class User
     public function getId()           { return $this->id; }
     public function setId($id)        { $this->id = $id; }
     public function getName()         { return $this->name; }
-    public function setName($name)    { $this->name = $name; }
+    public function setName($v)       { $this->name = $v; }
     public function getEmail()        { return $this->email; }
-    public function setEmail($email)  { $this->email = $email; }
-    public function getPassword()           { return $this->password; }
-    public function setPassword($password)  { $this->password = $password; }
+    public function setEmail($v)      { $this->email = $v; }
+    public function getPassword()     { return $this->password; }
+    public function setPassword($v)   { $this->password = $v; }
 
     public function register()
     {
@@ -36,15 +36,9 @@ class User
             $pre->bindValue(1, $this->name);
             $pre->bindValue(2, $this->email);
             $pre->bindValue(3, $this->password);
-
-            if ($pre->execute()) {
-                return true;
-            }
-
-            error_log("Erro ao cadastrar usuário: " . implode(', ', $pre->errorInfo()));
-            return false;
+            return $pre->execute() ? true : false;
         } catch (PDOException $e) {
-            error_log("Erro ao cadastrar usuário: " . $e->getMessage());
+            error_log('User::register — ' . $e->getMessage());
             return false;
         }
     }
@@ -52,12 +46,12 @@ class User
     public function show($email)
     {
         try {
-            $sql = $this->pdo->prepare("SELECT id, email FROM users WHERE email = :email;");
-            $sql->bindValue(":email", $email);
+            $sql = $this->pdo->prepare('SELECT id, email FROM users WHERE email = :email;');
+            $sql->bindValue(':email', $email);
             $sql->execute();
-            return ($sql->rowCount() > 0);
+            return $sql->rowCount() > 0;
         } catch (PDOException $e) {
-            error_log("Erro ao buscar usuário: " . $e->getMessage());
+            error_log('User::show — ' . $e->getMessage());
             return false;
         }
     }
@@ -65,15 +59,10 @@ class User
     public function showCustomers()
     {
         try {
-            $sql  = "SELECT name, email FROM users WHERE profile = 'user' ORDER BY name ASC;";
-            $data = $this->pdo->query($sql);
-
-            if ($data) {
-                return $data->fetchAll(PDO::FETCH_ASSOC);
-            }
-            return [];
+            $data = $this->pdo->query("SELECT name, email FROM users WHERE profile = 'user' ORDER BY name ASC;");
+            return $data ? $data->fetchAll(PDO::FETCH_ASSOC) : [];
         } catch (PDOException $e) {
-            error_log("Erro ao listar clientes: " . $e->getMessage());
+            error_log('User::showCustomers — ' . $e->getMessage());
             return [];
         }
     }
@@ -81,15 +70,10 @@ class User
     public function all()
     {
         try {
-            $sql  = 'SELECT name, email FROM users ORDER BY name ASC;';
-            $data = $this->pdo->query($sql);
-
-            if ($data) {
-                return $data->fetchAll(PDO::FETCH_ASSOC);
-            }
-            return [];
+            $data = $this->pdo->query("SELECT name, email FROM users ORDER BY name ASC;");
+            return $data ? $data->fetchAll(PDO::FETCH_ASSOC) : [];
         } catch (PDOException $e) {
-            error_log("Erro ao listar usuários: " . $e->getMessage());
+            error_log('User::all — ' . $e->getMessage());
             return [];
         }
     }

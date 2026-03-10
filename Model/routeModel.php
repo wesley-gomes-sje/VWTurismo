@@ -35,15 +35,9 @@ class Route
             $pre->bindValue(1, $this->origin);
             $pre->bindValue(2, $this->destination);
             $pre->bindValue(3, $this->distance);
-
-            if ($pre->execute()) {
-                return true;
-            }
-
-            error_log("Erro ao registrar rota: " . implode(', ', $pre->errorInfo()));
-            return false;
+            return $pre->execute() ? true : false;
         } catch (PDOException $e) {
-            error_log("Erro ao registrar rota: " . $e->getMessage());
+            error_log('Route::register — ' . $e->getMessage());
             return false;
         }
     }
@@ -51,19 +45,15 @@ class Route
     public function all()
     {
         try {
-            $sql  = 'SELECT cO.name AS origin, cD.name AS destination, r.distance AS distance
+            $sql = 'SELECT cO.name AS origin, cD.name AS destination, r.distance
                     FROM cities cO
-                    INNER JOIN routes r ON cO.id = r.origin
+                    INNER JOIN routes r  ON cO.id = r.origin
                     INNER JOIN cities cD ON cD.id = r.destination;';
             $data = $this->pdo->query($sql);
-
-            if ($data) {
-                return $data->fetchAll(PDO::FETCH_ASSOC);
-            }
-            return [];
+            return $data ? $data->fetchAll(PDO::FETCH_ASSOC) : false;
         } catch (PDOException $e) {
-            error_log("Erro ao listar rotas: " . $e->getMessage());
-            return [];
+            error_log('Route::all — ' . $e->getMessage());
+            return false;
         }
     }
 
@@ -73,15 +63,10 @@ class Route
             $pre = $this->pdo->prepare('SELECT id, distance FROM routes WHERE origin = ? AND destination = ?;');
             $pre->bindValue(1, $origin);
             $pre->bindValue(2, $destination);
-
-            if ($pre->execute()) {
-                return $pre->fetch(PDO::FETCH_ASSOC);
-            }
-
-            error_log("Erro ao verificar rota: " . implode(', ', $pre->errorInfo()));
-            return false;
+            $pre->execute();
+            return $pre->fetch(PDO::FETCH_ASSOC) ?: false;
         } catch (PDOException $e) {
-            error_log("Erro ao verificar rota: " . $e->getMessage());
+            error_log('Route::check — ' . $e->getMessage());
             return false;
         }
     }

@@ -32,15 +32,21 @@ class loginController
         $this->loginModel->setEmail($email);
         $this->loginModel->setPassword($password);
 
-        $islogin = $this->loginModel->login(
+        $user = $this->loginModel->login(
             $this->loginModel->getEmail(),
             $this->loginModel->getPassword()
         );
 
-        if (!$islogin) {
+        if (!$user) {
             $this->fillLogin('Usuario ou senha invalido.');
             return;
         }
+
+        session_regenerate_id(true);
+        $_SESSION['idUser']  = $user['id'];
+        $_SESSION['email']   = $user['email'];
+        $_SESSION['profile'] = $user['profile'];
+        $_SESSION['name']    = $user['name'];
 
         if ($_SESSION['profile'] === 'user') {
             return $this->menuView->customer();

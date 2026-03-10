@@ -2,125 +2,94 @@
 
 namespace Tests\Unit\Model;
 
+use App\Model\Vehicle;
 use PDO;
 use PDOException;
 use PDOStatement;
 use PHPUnit\Framework\TestCase;
-use App\Model\Vehicle;
 
 class VehicleTest extends TestCase
 {
-    private function makeSuccessStatement(): PDOStatement
+    private function makeStmt(bool $executes = true): PDOStatement
     {
         $stmt = $this->createMock(PDOStatement::class);
         $stmt->method('bindValue')->willReturn(true);
-        $stmt->method('execute')->willReturn(true);
+        $stmt->method('execute')->willReturn($executes);
         return $stmt;
     }
 
-    private function makeFailStatement(): PDOStatement
+    private function makePdo(PDOStatement $stmt): PDO
     {
-        $stmt = $this->createMock(PDOStatement::class);
-        $stmt->method('bindValue')->willReturn(true);
-        $stmt->method('execute')->willReturn(false);
-        $stmt->method('errorInfo')->willReturn(['HY000', 1, 'DB error']);
-        return $stmt;
+        $pdo = $this->createMock(PDO::class);
+        $pdo->method('prepare')->willReturn($stmt);
+        return $pdo;
     }
 
     // --- register() ---
 
     public function testRegisterReturnsTrueOnSuccess(): void
     {
-        $stmt = $this->makeSuccessStatement();
+        $v = new Vehicle($this->makePdo($this->makeStmt(true)));
+        $v->setBrand('VW');
+        $v->setModel('Bus');
+        $v->setPlate('ABC-1234');
+        $v->setYear(2022);
 
-        $pdo = $this->createMock(PDO::class);
-        $pdo->method('prepare')->willReturn($stmt);
-
-        $vehicle = new Vehicle($pdo);
-        $vehicle->setBrand('Mercedes');
-        $vehicle->setModel('Torino');
-        $vehicle->setPlate('ABC1234');
-        $vehicle->setYear('2020');
-
-        $this->assertTrue($vehicle->register());
+        $this->assertTrue($v->register());
     }
 
     public function testRegisterReturnsFalseWhenExecuteFails(): void
     {
-        $stmt = $this->makeFailStatement();
-
-        $pdo = $this->createMock(PDO::class);
-        $pdo->method('prepare')->willReturn($stmt);
-
-        $vehicle = new Vehicle($pdo);
-        $vehicle->setBrand('Mercedes');
-        $vehicle->setModel('Torino');
-        $vehicle->setPlate('ABC1234');
-        $vehicle->setYear('2020');
-
-        $this->assertFalse($vehicle->register());
+        $v = new Vehicle($this->makePdo($this->makeStmt(false)));
+        $this->assertFalse($v->register());
     }
 
-    public function testRegisterReturnsFalseOnPdoException(): void
+    public function testRegisterReturnsFalseOnException(): void
     {
         $pdo = $this->createMock(PDO::class);
         $pdo->method('prepare')->willThrowException(new PDOException('fail'));
-
-        $vehicle = new Vehicle($pdo);
-        $vehicle->setBrand('Mercedes');
-        $vehicle->setModel('Torino');
-        $vehicle->setPlate('ABC1234');
-        $vehicle->setYear('2020');
-
-        $this->assertFalse($vehicle->register());
+        $this->assertFalse((new Vehicle($pdo))->register());
     }
 
     // --- all() ---
 
-    public function testAllReturnsArrayOfVehicles(): void
+    public function testAllReturnsData(): void
     {
-        $expected = [
-            ['id' => 1, 'brand' => 'Mercedes', 'model' => 'Torino', 'plate' => 'ABC1234', 'year' => '2020'],
-        ];
-
+        $rows = [['id' => 1, 'brand' => 'VW', 'model' => 'Bus', 'plate' => 'ABC-1234', 'year' => 2022]];
         $stmt = $this->createMock(PDOStatement::class);
-        $stmt->method('fetchAll')->willReturn($expected);
+        $stmt->method('fetchAll')->willReturn($rows);
 
         $pdo = $this->createMock(PDO::class);
         $pdo->method('query')->willReturn($stmt);
 
-        $vehicle = new Vehicle($pdo);
-
-        $this->assertSame($expected, $vehicle->all());
+        $this->assertSame($rows, (new Vehicle($pdo))->all());
     }
 
-    public function testAllReturnsEmptyArrayOnPdoException(): void
+    public function testAllReturnsEmptyArrayOnException(): void
     {
         $pdo = $this->createMock(PDO::class);
         $pdo->method('query')->willThrowException(new PDOException('fail'));
 
-        $vehicle = new Vehicle($pdo);
-
-        $this->assertSame([], $vehicle->all());
+        $result = (new Vehicle($pdo))->all();
+        $this->assertIsArray($result);
+        $this->assertEmpty($result);
     }
 
     // --- getters / setters ---
 
-    public function testSetAndGetBrand(): void
+    public function testGettersAndSetters(): void
     {
-        $pdo     = $this->createMock(PDO::class);
-        $vehicle = new Vehicle($pdo);
-        $vehicle->setBrand('Volvo');
+        $v = new Vehicle($this->createMock(PDO::class));
+        $v->setId(1);
+        $v->setBrand('VW');
+        $v->setModel('Bus');
+        $v->setPlate('XYZ-9999');
+        $v->setYear(2020);
 
-        $this->assertSame('Volvo', $vehicle->getBrand());
-    }
-
-    public function testSetAndGetPlate(): void
-    {
-        $pdo     = $this->createMock(PDO::class);
-        $vehicle = new Vehicle($pdo);
-        $vehicle->setPlate('XYZ9999');
-
-        $this->assertSame('XYZ9999', $vehicle->getPlate());
+        $this->assertSame(1,          $v->getId());
+        $this->assertSame('VW',       $v->getBrand());
+        $this->assertSame('Bus',      $v->getModel());
+        $this->assertSame('XYZ-9999', $v->getPlate());
+        $this->assertSame(2020,       $v->getYear());
     }
 }

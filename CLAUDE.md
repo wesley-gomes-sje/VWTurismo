@@ -42,14 +42,14 @@ VWTurismo/
 │   └── Connection.php         ← App\Database\Connection — singleton PDO (Etapa 2)
 ├── Controller/                ← namespace App\Controller (Etapa 1)
 │   ├── AuthController.php     ← Stub vazio
-│   ├── loginController.php
+│   ├── loginController.php    ← Gerencia sessão após login (Etapa 5)
 │   ├── userController.php
 │   ├── cityController.php
 │   ├── vehicleController.php
 │   ├── routeController.php
 │   └── ticketsController.php
 ├── Model/                     ← namespace App\Model (Etapa 1) + ?PDO injetado (Etapa 2)
-│   ├── loginModel.php         ← class Login
+│   ├── loginModel.php         ← class Login — retorna array|false, sem $_SESSION (Etapa 5)
 │   ├── User.php               ← class User
 │   ├── cityModel.php          ← class City
 │   ├── vehicleModel.php       ← class Vehicle
@@ -77,7 +77,7 @@ VWTurismo/
 │   └── Unit/
 │       ├── Database/ConnectionTest.php
 │       ├── Model/{City,User,Vehicle,Route,Ticket,Login}Test.php
-│       ├── RouterTest.php     ← 13 testes do Router (Etapa 3)
+│       ├── RouterTest.php         ← 13 testes do Router (Etapa 3)
 │       └── AuthMiddlewareTest.php ← 9 testes do Middleware (Etapa 4)
 ├── phpunit.xml                ← Configuração PHPUnit 11
 ├── database/
@@ -123,16 +123,16 @@ $router->dispatch(string $method, string $uri): bool;
 ### AuthMiddleware API
 
 ```php
-AuthMiddleware::check(): bool                              // verifica $_SESSION['idUser']
-AuthMiddleware::handle(?callable $redirectFn = null): bool // redireciona se não autenticado
+AuthMiddleware::check(): bool
+AuthMiddleware::handle(?callable $redirectFn = null): bool
 AuthMiddleware::protect(callable|array $handler, ?callable $redirectFn = null): callable
 ```
 
 ---
 
-## Padrão de injeção de dependência nos Models (Etapa 2)
+## Padrão de injeção de dependência nos Models (Etapa 2+5)
 
-Todos os models agora aceitam PDO opcional:
+Todos os models aceitam PDO opcional:
 
 ```php
 public function __construct(?PDO $pdo = null)
@@ -144,6 +144,8 @@ public function __construct(?PDO $pdo = null)
 - **Produção**: `new City()` → usa `App\Database\Connection::getInstance()`
 - **Testes**: `new City($mockPdo)` → usa o mock injetado
 
+`Login::login()` retorna `array|false` — sem `$_SESSION`. O controller gerencia a sessão.
+
 ---
 
 ## Plano de refatoração — estado atual
@@ -154,7 +156,7 @@ public function __construct(?PDO $pdo = null)
 | 2 | Conexão com o banco (DI / singleton) + TDD | ✅ Concluída | `refactor/etapa-2-database-connection` | [#4](https://github.com/wesley-gomes-sje/VWTurismo/pull/4) |
 | 3 | Roteador simples com mapeamento explícito | ✅ Concluída | `refactor/etapa-3-router` | [#5](https://github.com/wesley-gomes-sje/VWTurismo/pull/5) |
 | 4 | Autenticação e Middleware | ✅ Concluída | `refactor/etapa-4-auth-middleware` | [#6](https://github.com/wesley-gomes-sje/VWTurismo/pull/6) |
-| 5 | Refatorar Models (responsabilidade única) | ⏳ Pendente | — | — |
+| 5 | Refatorar Models (responsabilidade única) | ✅ Concluída | `refactor/etapa-5-models` | [#7](https://github.com/wesley-gomes-sje/VWTurismo/pull/7) |
 | 6 | Refatorar Controllers (extrair helpers) | ⏳ Pendente | — | — |
 | 7 | Refatorar Views (templates reais, sem concatenação) | ⏳ Pendente | — | — |
 | 8 | Limpeza final (JWT, CSRF, código morto) | ⏳ Pendente | — | — |
@@ -172,13 +174,7 @@ public function __construct(?PDO $pdo = null)
 - Todos os **Models** receberam `namespace App\Model` + `use Connection` + remoção de `require_once`
 - Todas as **Views** receberam `namespace App\View` + remoção de `require_once './auth.php'`
 - Todos os **Controllers** receberam `namespace App\Controller` + `use` statements das dependências
-- `index.php`: removidos todos os `require_once` de controllers/views; adicionado `require vendor/autoload.php`; `session_start()` movido para cá; resolução de classe usa namespace completo
-
-### Bugs corrigidos nesta etapa
-
-- `print_r(errorInfo())` e `echo $e->getMessage()` em todos os Models → `error_log()`
-- `showCustomers()` em `User`: `WHERE profile=user` → `WHERE profile='user'`
-- `userController::$userView` apontava para `menuView` → corrigido para `cadUsuarioView`
+- `index.php`: removidos todos os `require_once` de controllers/views; adicionado `require vendor/autoload.php`; `session_start()` movido para cá
 
 ### Commits
 
@@ -203,13 +199,9 @@ edf2a74 build: add PSR-4 autoloading and files/classmap to composer.json
 - Instalado `phpunit/phpunit ^11.0` como dev dependency
 - Criado `phpunit.xml` com suite Unit e configuração de source coverage
 - Criado `tests/bootstrap.php` com `chdir()` + `ini_set('error_log', '/dev/null')`
-- Criado `Database/Connection.php` (`App\Database\Connection`) como singleton com:
-  - `getInstance()` — retorna o PDO compartilhado
-  - `setInstance(PDO)` — injeta instância para testes
-  - `reset()` — limpa instância entre testes
+- Criado `Database/Connection.php` (`App\Database\Connection`) como singleton
 - Todos os 6 Models atualizados para aceitar `?PDO $pdo = null` no construtor
-- **64 testes unitários passando**, 65 assertions, cobertura dos 6 models + Connection
-- Corrigido bug: `price` na migration `INT` → `DECIMAL(10,2)`
+- **64 testes unitários passando**, 65 assertions
 
 ### Commits
 
@@ -230,14 +222,10 @@ edf2a74 build: add PSR-4 autoloading and files/classmap to composer.json
 
 ### O que foi feito
 
-- Criado `Router.php` com:
-  - `add(method, uri, handler)` — registra rotas
-  - `dispatch(method, uri)` — normaliza método/URI, faz match, chama handler
-  - Handler injetável para 404 (testável sem mocks complexos)
-- Criado `routes/web.php` com mapeamento explícito de todas as 20+ rotas
-- Atualizado `index.php`: usa `Router`, sem `require_once` por controller, sem `new $classe()`
-- Atualizado `public/index.php`: bootstrap limpo para web root em `public/`
-- Atualizado `.htaccess`: encaminha para `index.php` usando `REQUEST_URI` (sem `?url=`)
+- Criado `Router.php` com `add()` e `dispatch()`
+- Criado `routes/web.php` com mapeamento explícito de todas as rotas
+- Atualizado `index.php`: usa `Router`, sem `new $classe()` dinâmico
+- Atualizado `.htaccess`: usa `REQUEST_URI` (sem `?url=`)
 - **13 testes unitários passando**, 19 assertions
 
 ### Commits da Etapa 3
@@ -259,13 +247,10 @@ refactor: replace dynamic class dispatch in index.php with Router
 
 ### O que foi feito
 
-- Criado `middlewares/AuthMiddleware.php` com:
-  - `check(): bool` — puro, verifica `$_SESSION['idUser']` (testável sem side effects)
-  - `handle(?callable $redirectFn): bool` — redireciona para `/login` se não autenticado; `$redirectFn` injetável em testes evita `header()`/`exit()`
-  - `protect(handler, redirectFn): callable` — envolve um handler com verificação de auth; para execução se não autenticado
+- Criado `middlewares/AuthMiddleware.php` com `check()`, `handle()`, `protect()`
 - Todas as rotas protegidas envolvidas com `AuthMiddleware::protect()` em `routes/web.php`
-- `session_regenerate_id(true)` adicionado ao `loginModel::login()` após login bem-sucedido (previne session fixation)
-- Removido `checkAuth()` do construtor do `ticketsController` — middleware centraliza a responsabilidade
+- `session_regenerate_id(true)` no login bem-sucedido (previne session fixation)
+- Removido `checkAuth()` dos constructors dos controllers
 - **9 testes unitários passando**, 10 assertions
 
 ### Commits da Etapa 4
@@ -280,26 +265,46 @@ fix:   add session_regenerate_id on login and remove checkAuth() from controller
 
 ---
 
+## Etapa 5 — Concluída (detalhes)
+
+**Branch:** `refactor/etapa-5-models`
+**Base:** `main` (commit `ad3791d`)
+
+### O que foi feito
+
+- Todos os 6 models refatorados:
+  - `?PDO $pdo = null` no construtor; fallback para `Connection::getInstance()`
+  - Removido `require_once './connection.php'` de todos
+  - Substituído `echo`/`print_r` por `error_log()`
+  - Código simplificado (ternários, mensagens de erro prefixadas com classe)
+- `Login::login()` agora **retorna `array` com dados do usuário** (ou `false`) — sem `$_SESSION`
+- `loginController::login()` assume gerenciamento de sessão + `session_regenerate_id(true)`
+- Corrigido bug SQL em `User`: `WHERE profile=user` → `WHERE profile='user'`
+- `calculatePrice()` com tipos explícitos: `float $distance): float`
+- **54 testes unitários passando**, 78 assertions
+
+### Commits da Etapa 5
+
+```
+build:    install PHPUnit 11, configure test infra and add App\Database\Connection singleton
+test:     add 54 unit tests for all 6 models (Red phase — TDD)
+refactor: inject PDO into all models and remove session logic from Login
+refactor: move session management from loginModel to loginController
+```
+
+---
+
 ## Merge: esteira1-ai ← refactor/etapa-2-database-connection
 
 ### Conflitos resolvidos
 
 | Arquivo | Conflito | Resolução |
 |---------|----------|-----------|
-| `Model/cityModel.php` | Namespace `App\Model` (Etapa 1) vs `use App\Database\Connection` (Etapa 2); construtor antigo vs DI | Mantido `namespace App\Model` + `use App\Database\Connection` + construtor `?PDO $pdo = null` |
-| `Model/loginModel.php` | Mesmo padrão de namespace + construtor | Idem |
-| `Model/User.php` | Namespace + construtor + formatação SQL (`SELECT id,email` vs `SELECT id, email`) | Namespace + DI; SQL formatado com espaços |
-| `Model/vehicleModel.php` | Namespace + construtor + whitespace em `all()` | Namespace + DI; formatação unificada |
-| `Model/routeModel.php` | Namespace + construtor + formatação SQL do JOIN em `all()` | Namespace + DI; SQL da Etapa 1 mantido |
-| `Model/ticketModel.php` | Namespace + construtor + quebra de linha em SQL | Namespace + DI; SQL da Etapa 1 mantido |
-| `composer.json` | PSR-4 da Etapa 1 vs PSR-4 da Etapa 2 (`App\Database`) + `require-dev` PHPUnit | Unificado: todos os namespaces PSR-4 + `require-dev` |
-| `CLAUDE.md` | Dois arquivos criados independentemente em cada branch | Conteúdo unificado |
-| `database/Connection.php` | Arquivo não-rastreado bloqueava o merge | Removido (artefato; merge trouxe `Database/Connection.php`) |
-| `tests/Unit/Model/*.php` | Testes usavam `use City;` (sem namespace) | Atualizado para `use App\Model\City;` etc. |
-
-### Critério de resolução
-
-> Manteve-se o **namespace `App\Model`** introduzido pela Etapa 1 e o **construtor com injeção de dependência** (`?PDO $pdo = null`) introduzido pela Etapa 2. `Model/` mantido como `classmap` (filenames `cityModel.php` não batem com PSR-4 que exigiria `City.php`).
+| `Model/*.php` | Namespace `App\Model` (Etapa 1) vs `use App\Database\Connection` + DI (Etapa 2) | Mantido namespace + DI |
+| `composer.json` | PSR-4 vs PSR-4 + `App\Database` + `require-dev` | Unificado |
+| `CLAUDE.md` | Dois arquivos criados independentemente | Conteúdo unificado |
+| `database/Connection.php` | Arquivo não-rastreado bloqueava o merge | Removido |
+| `tests/Unit/Model/*.php` | `use City;` sem namespace | Atualizado para `use App\Model\City;` etc. |
 
 ---
 
@@ -309,12 +314,10 @@ fix:   add session_regenerate_id on login and remove checkAuth() from controller
 
 | Arquivo | Conflito | Resolução |
 |---------|----------|-----------|
-| `composer.json` | PSR-4 do HEAD vs `Router.php` no classmap da Etapa 3 | PSR-4 do HEAD + `Router.php` no classmap |
-| `index.php` | Roteamento dinâmico (HEAD) vs Router dispatch (Etapa 3) | Etapa 3 com FQN `App\Controller\loginController` |
-| `public/index.php` | Dois bootstraps ligeiramente diferentes | Etapa 3: docblock mais limpo |
-| `phpunit.xml` | Cobertura `Database/`+`Model/` vs adição de `Router.php` | Unificado: Database + Model + Router.php |
-| `CLAUDE.md` | HEAD com Etapa 1+2; Etapa 3 com planejamento atualizado | Histórico completo unificado |
-| `routes/web.php` | Auto-merged com nomes curtos de classe | Corrigido para FQN `App\Controller\*` |
+| `composer.json` | PSR-4 do HEAD vs `Router.php` no classmap da Etapa 3 | PSR-4 + `Router.php` no classmap |
+| `index.php` | Roteamento dinâmico vs Router dispatch | Etapa 3 com FQN |
+| `phpunit.xml` | Database+Model vs + Router.php | Unificado |
+| `routes/web.php` | Auto-merged com nomes curtos | Corrigido para FQN `App\Controller\*` |
 
 ---
 
@@ -324,36 +327,53 @@ fix:   add session_regenerate_id on login and remove checkAuth() from controller
 
 | Arquivo | Conflito | Resolução |
 |---------|----------|-----------|
-| `composer.json` | PSR-4 do HEAD vs classmap-only da Etapa 4 (que criou branch de `main`) | Mantido PSR-4 do HEAD (correto para esteira1-ai) |
-| `index.php` | FQN `App\Controller\loginController` (HEAD) vs nome curto (Etapa 4) | Mantido FQN do HEAD |
-| `phpunit.xml` | Database+Model+Router.php (HEAD) vs apenas middlewares/ (Etapa 4) | Unificado: todas as quatro fontes |
-| `tests/bootstrap.php` | HEAD com docblock explicativo vs Etapa 4 sem docblock | Mantido docblock do HEAD |
-| `Controller/ticketsController.php` | HEAD com `checkAuth()` no construtor vs Etapa 4 sem ele | Etapa 4: removido `checkAuth()` (middleware centraliza) |
-| `Model/loginModel.php` | HEAD sem `session_regenerate_id` vs Etapa 4 com ele | Etapa 4: mantido `session_regenerate_id(true)` |
-| `routes/web.php` | HEAD com FQN sem proteção vs Etapa 4 com `AuthMiddleware::protect()` e nomes curtos | Combinado: FQN do HEAD + `AuthMiddleware::protect()` da Etapa 4 |
-| `CLAUDE.md` | Histórico até Etapa 3 (HEAD) vs Etapa 4 adicionada (branch) | Histórico completo unificado |
-
-### Critério de resolução
-
-> Em `routes/web.php` foi necessário combinar manualmente: a Etapa 4 introduziu `AuthMiddleware::protect()` usando nomes curtos de classe, enquanto o HEAD já tinha FQN. A resolução manteve FQN + protect().
+| `composer.json` | PSR-4 do HEAD vs classmap-only da Etapa 4 | Mantido PSR-4 do HEAD |
+| `index.php` | FQN (HEAD) vs nome curto (Etapa 4) | Mantido FQN do HEAD |
+| `phpunit.xml` | Database+Model+Router vs só middlewares | Unificado: todas as quatro fontes |
+| `Controller/ticketsController.php` | `checkAuth()` no construtor | Removido (middleware centraliza) |
+| `Model/loginModel.php` | Sem `session_regenerate_id` vs com | Mantido `session_regenerate_id(true)` |
+| `routes/web.php` | FQN sem proteção vs nomes curtos + protect | Combinado: FQN + `AuthMiddleware::protect()` |
+| `middlewares/AuthMiddleware.php` | Sem namespace | Adicionado `namespace App\Middleware` |
+| `AuthMiddlewareTest.php` | `use AuthMiddleware` sem namespace | Corrigido para `use App\Middleware\AuthMiddleware` |
 
 ---
 
-## Etapa 5 — Próxima (planejamento)
+## Merge: esteira1-ai ← refactor/etapa-5-models
 
-**Objetivo:** Refatorar Models — responsabilidade única.
+### Conflitos resolvidos
+
+| Arquivo | Conflito | Resolução |
+|---------|----------|-----------|
+| `Model/*.php` (6 arquivos) | HEAD com `namespace App\Model` + verbose; Etapa 5 sem namespace + compacto | Namespace do HEAD + código compacto da Etapa 5 |
+| `Model/loginModel.php` | HEAD com `$_SESSION` + `session_regenerate_id`; Etapa 5 retorna array | Etapa 5: retorna `array\|false`, sem sessão |
+| `Controller/loginController.php` | HEAD gerencia sessão via model; Etapa 5 usa variável `$user` indefinida | Corrigido: `$user = login(getEmail, getPassword)` + sessão no controller |
+| `composer.json` | HEAD com PSR-4 completo + Router.php; Etapa 5 sem Controller/View/Middleware no PSR-4 | Mantido PSR-4 completo do HEAD |
+| `phpunit.xml` | HEAD com Database+Model+middlewares+Router; Etapa 5 só Database+Model | Mantido completo do HEAD |
+| `tests/bootstrap.php` | HEAD com docblock; Etapa 5 sem | Mantido docblock do HEAD |
+| `tests/Unit/Model/*.php` (6 arquivos) | HEAD com `use App\Model\X`; Etapa 5 com `use X` | Etapa 5 (compacto) + FQN correto do HEAD |
+
+### Critério de resolução
+
+> Para os Models: namespace `App\Model` + `use PDO` + `use PDOException` do HEAD (necessário para PSR-4 e type hints) + implementação compacta da Etapa 5 (ternários, mensagens prefixadas).
+> Para `loginController`: removida a dupla chamada a `login()` que a branch da Etapa 5 introduziria — usado `$user = login(getEmail(), getPassword())` corretamente.
+> Para os Testes: versão compacta da Etapa 5 com `use App\Model\X` correto.
+
+---
+
+## Etapa 6 — Próxima (planejamento)
+
+**Objetivo:** Refatorar Controllers — extrair helpers duplicados.
 
 **O que será feito:**
-- Mover lógica de sessão (`$_SESSION`) para fora do `loginModel` — model deve só retornar dados
-- `loginModel::login()` retorna array com dados do usuário (ou false), controller atribui sessão
-- Garantir que todos os models estão com DI completa (`?PDO $pdo = null`)
-- TDD: testar cada model com mock PDO, sem banco real
+- Extrair `sanitizeString()` duplicado em todos os controllers para um helper ou trait
+- Remover `session_start()` do `loginController` (já feito no `index.php`)
+- Garantir que todos os controllers recebem dependências via construtor
 
 ---
 
 ## Convenções adotadas no projeto
 
-- **Branch por etapa:** `refactor/etapa-N-descricao-curta` criada a partir de `main` (branches isoladas) ou mergeada sequencialmente na `esteira1-ai`
+- **Branch por etapa:** `refactor/etapa-N-descricao-curta` criada a partir de `main` (branches isoladas) mergeadas sequencialmente na `esteira1-ai`
 - **Commits semânticos:** `build:`, `refactor:`, `feat:`, `fix:`, `docs:`, `chore:`, `test:`
 - **`main` nunca quebra** — todo trabalho em branch separada
 - **TDD obrigatório** a partir da Etapa 2 — escrever testes antes de implementar
@@ -372,7 +392,7 @@ fix:   add session_regenerate_id on login and remove checkAuth() from controller
 | `index.php` | Entry point atualizado (Etapa 3) |
 | `Database/Connection.php` | Classe de conexão singleton |
 | `middlewares/AuthMiddleware.php` | Middleware de autenticação (Etapa 4) |
-| `tests/Unit/RouterTest.php` | Exemplo de testes do Router |
-| `tests/Unit/AuthMiddlewareTest.php` | Exemplo de testes do Middleware |
-| `tests/Unit/Model/CityTest.php` | Exemplo de como escrever testes para models |
+| `Model/loginModel.php` | Login retorna array (Etapa 5) |
+| `Controller/loginController.php` | Gerencia sessão após login (Etapa 5) |
+| `tests/Unit/Model/CityTest.php` | Exemplo de testes de models |
 | `View/menuView.php` | Entender a estrutura das views antes da Etapa 7 |
