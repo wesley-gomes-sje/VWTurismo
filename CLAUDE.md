@@ -139,16 +139,16 @@ public function __construct(?PDO $pdo = null)
 
 ## Plano de refatoração — estado atual
 
-| Etapa | Descrição | Status | Branch |
-|-------|-----------|--------|--------|
-| 1 | Autoloading PSR-4 + Namespaces | ✅ Concluída | `refactor/etapa-1-autoloading-namespaces` |
-| 2 | Conexão com o banco (DI / singleton) + TDD | ✅ Concluída | `refactor/etapa-2-database-connection` |
-| 3 | Roteador simples com mapeamento explícito | ✅ Concluída | `refactor/etapa-3-router` |
-| 4 | Autenticação e Middleware | ⏳ Pendente | — |
-| 5 | Refatorar Models (responsabilidade única) | ⏳ Pendente | — |
-| 6 | Refatorar Controllers (extrair helpers) | ⏳ Pendente | — |
-| 7 | Refatorar Views (templates reais, sem concatenação) | ⏳ Pendente | — |
-| 8 | Limpeza final (JWT, CSRF, código morto) | ⏳ Pendente | — |
+| Etapa | Descrição | Status | Branch | PR |
+|-------|-----------|--------|--------|----|
+| 1 | Autoloading PSR-4 + Namespaces | ✅ Concluída | `refactor/etapa-1-autoloading-namespaces` | [#3](https://github.com/wesley-gomes-sje/VWTurismo/pull/3) |
+| 2 | Conexão com o banco (DI / singleton) + TDD | ✅ Concluída | `refactor/etapa-2-database-connection` | [#4](https://github.com/wesley-gomes-sje/VWTurismo/pull/4) |
+| 3 | Roteador simples com mapeamento explícito | ✅ Concluída | `refactor/etapa-3-router` | [#5](https://github.com/wesley-gomes-sje/VWTurismo/pull/5) |
+| 4 | Autenticação e Middleware | ⏳ Pendente | — | — |
+| 5 | Refatorar Models (responsabilidade única) | ⏳ Pendente | — | — |
+| 6 | Refatorar Controllers (extrair helpers) | ⏳ Pendente | — | — |
+| 7 | Refatorar Views (templates reais, sem concatenação) | ⏳ Pendente | — | — |
+| 8 | Limpeza final (JWT, CSRF, código morto) | ⏳ Pendente | — | — |
 
 ---
 
