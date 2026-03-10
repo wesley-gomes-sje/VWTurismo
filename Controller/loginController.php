@@ -1,28 +1,30 @@
 <?php
-session_start();
-require_once './Model/loginModel.php';
-require_once './View/cadUsuarioView.php';
-require_once './View/menuView.php';
+
+namespace App\Controller;
+
+use App\Model\Login;
+use App\View\cadUsuarioView;
+use App\View\menuView;
+
 class loginController
 {
     private $loginModel;
     private $menuView;
     private $userView;
-    
-    public function __construct() {
+
+    public function __construct()
+    {
         $this->loginModel = new Login();
-        $this->menuView = new menuView();
-        $this->userView = new cadUsuarioView();
+        $this->menuView   = new menuView();
+        $this->userView   = new cadUsuarioView();
     }
 
     public function login()
     {
-        $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
+        $email    = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
         $password = $this->sanitizeString($_POST['password'] ?? '');
 
-
         if (!$email || !$password) {
-
             $this->fillLogin('Usuário e senha são obrigatórios.');
             return;
         }
@@ -30,19 +32,20 @@ class loginController
         $this->loginModel->setEmail($email);
         $this->loginModel->setPassword($password);
 
-        $getEmail = $this->loginModel->getEmail();
-        $getPassword = $this->loginModel->getPassword();
+        $islogin = $this->loginModel->login(
+            $this->loginModel->getEmail(),
+            $this->loginModel->getPassword()
+        );
 
-        $islogin = $this->loginModel->login($getEmail, $getPassword);
         if (!$islogin) {
-
             $this->fillLogin('Usuario ou senha invalido.');
             return;
         }
-        
-        if ($_SESSION['profile'] == "user") {
+
+        if ($_SESSION['profile'] === 'user') {
             return $this->menuView->customer();
-        } 
+        }
+
         return $this->menuView->admin();
     }
 

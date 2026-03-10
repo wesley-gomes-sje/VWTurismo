@@ -1,26 +1,25 @@
 <?php
-require_once './auth.php';
 
+namespace App\View;
+
+use DateTime;
 
 class menuView
 {
-    public function __construct() {
+    public function __construct() {}
 
-    }
-    //DIRECIONAMENTO PARA TELAS
     public function admin()
     {
         $content = '<img src="../assets/logo.PNG" class="img">';
         include './View/Templates/templateAdm.php';
     }
+
     public function customer()
     {
         $content = '<img src="../assets/logo.PNG"> ';
         include './View/Templates/templateCustomer.php';
     }
 
-
-   
     public function createVehicle($message, $data)
     {
         checkAuth();
@@ -46,18 +45,18 @@ class menuView
          </tr>';
         $content .= $table . $trH;
         foreach ($data as $item) {
-            $listing =  '<tr>';
-            $listing .= '<td>' . $item['brand'] . '</td>' . '<td>' . $item['model'] . '</td>' .  '<td>' . $item['plate'] . '</td>' .'<td>' . $item['year'] . '</td>';
+            $listing  = '<tr>';
+            $listing .= '<td>' . htmlspecialchars($item['brand']) . '</td>';
+            $listing .= '<td>' . htmlspecialchars($item['model']) . '</td>';
+            $listing .= '<td>' . htmlspecialchars($item['plate']) . '</td>';
+            $listing .= '<td>' . htmlspecialchars($item['year'])  . '</td>';
             $listing .= '</tr>';
             $content .= $listing;
-        };
+        }
         $content .= '</table>';
         $content .= '</div>';
         include './View/Templates/templateAdm.php';
     }
-
-
-
 
     public function registerCity($message, $data)
     {
@@ -79,11 +78,10 @@ class menuView
      </tr>';
         $content .= $table . $trH;
         foreach ($data as $item) {
-            $listing = '<tr>';
-            $listing .= '<td style="width:80px">' . $item['name'] . '</td>' . '<td>' . '<a href="/city/show&id=' . $item['id'] . '">
-            <button style="width:100%" type="button" >Editar</button></a>' . '</td>'
-                . '<td style="width:70px">' . '<a href="/city/delete&id=' . $item['id'] . '">
-            <button style="width:100%" type="button">Excluir</button></a>' . '</td>';
+            $listing  = '<tr>';
+            $listing .= '<td style="width:80px">' . htmlspecialchars($item['name']) . '</td>';
+            $listing .= '<td><a href="/city/show&id=' . (int)$item['id'] . '"><button style="width:100%" type="button">Editar</button></a></td>';
+            $listing .= '<td style="width:70px"><a href="/city/delete&id=' . (int)$item['id'] . '"><button style="width:100%" type="button">Excluir</button></a></td>';
             $listing .= '</tr>';
             $content .= $listing;
         }
@@ -92,15 +90,11 @@ class menuView
         include './View/Templates/templateAdm.php';
     }
 
-
-
-
-
     public function editCity($data)
     {
         checkAuth();
-        $id = $data[0]['id'];
-        $name = $data[0]['name'];
+        $id   = (int) $data[0]['id'];
+        $name = htmlspecialchars($data[0]['name']);
         $content = '<div class="FormEsquerda formbase">
             <form action="/city/edit&id=' . $id . '" method="POST">
             <h1>Editar</h1>
@@ -111,16 +105,11 @@ class menuView
         include './View/Templates/templateAdm.php';
     }
 
-
-
-
-
-    
     public function registerRoute($message, $data, $cities)
     {
         checkAuth();
-        $city = $this->listCities($cities);
-        $content = '<div class="FormEsquerda formbase"style="height: auto">
+        $city    = $this->listCities($cities);
+        $content = '<div class="FormEsquerda formbase" style="height: auto">
             <form action="/route/register" method="POST">
             <h1>Cadastrar</h1>
             ' . "{$message}" . '<br>
@@ -139,15 +128,17 @@ class menuView
              <div class="FormDireita formbase">
              <h1>Listagem</h1>';
         $table = '<table>';
-        $trH = '<tr>
+        $trH   = '<tr>
              <th> Origem </th>
              <th> Destino </th>
              <th> Distancia </th>
           </tr>';
         $content .= $table . $trH;
         foreach ($data as $line) {
-            $list = '<tr>';
-            $list .= '<td>' . $line['origin'] . '</td>' . '<td>' . $line['destination'] . '</td>' . '<td>' . $line['distance'] . '</td>';
+            $list  = '<tr>';
+            $list .= '<td>' . htmlspecialchars($line['origin'])      . '</td>';
+            $list .= '<td>' . htmlspecialchars($line['destination'])  . '</td>';
+            $list .= '<td>' . htmlspecialchars($line['distance'])     . '</td>';
             $list .= '</tr>';
             $content .= $list;
         }
@@ -156,11 +147,8 @@ class menuView
         include './View/Templates/templateAdm.php';
     }
 
-
-
-
     public function registerTicket($message, $cities, $vehicles, $tickets)
-    { 
+    {
         checkAuth();
         $onibus = $this->listVehicles($vehicles);
         $cidade = $this->listCities($cities);
@@ -188,7 +176,7 @@ class menuView
         <div class="FormDireita formbase" style="width: auto">
         <h1>Verificar</h1>';
         $table = '<table class="tabelaVerifica" style="margin: 0px 35px;">';
-        $trH = '<tr >
+        $trH   = '<tr>
         <th> Data </th>
         <th> Origem </th>
         <th> Destino </th>
@@ -197,8 +185,12 @@ class menuView
         </tr>';
         $content .= $table . $trH;
         foreach ($tickets as $item) {
-            $listing = '<tr>';
-            $listing .= '<td>' . (new DateTime($item['date']))->format('d/m/Y') . '</td>' . '<td>' . $item['origin'] . '</td>' . '<td>' . $item['destination'] . '</td>' . '<td>' .  $item['distance'] . '</td>' . '<td>' . 'R$ ' . $item['price'] . '</td>';
+            $listing  = '<tr>';
+            $listing .= '<td>' . (new DateTime($item['date']))->format('d/m/Y') . '</td>';
+            $listing .= '<td>' . htmlspecialchars($item['origin'])      . '</td>';
+            $listing .= '<td>' . htmlspecialchars($item['destination'])  . '</td>';
+            $listing .= '<td>' . htmlspecialchars($item['distance'])     . '</td>';
+            $listing .= '<td>R$ ' . htmlspecialchars($item['price'])    . '</td>';
             $listing .= '</tr>';
             $content .= $listing;
         }
@@ -207,16 +199,13 @@ class menuView
         include './View/Templates/templateCustomer.php';
     }
 
-
-
-
     public function all($tickets)
     {
         checkAuth();
         $content = '<div class="FormDireita formbase" style="width: auto;height:auto">
         <h1>Verificar</h1>';
         $table = '<table class="tabelaVerifica" style="margin: 0px 35px;margin-bottom:20px">';
-        $trH = '<tr >
+        $trH   = '<tr>
         <th> Data </th>
         <th> Origem </th>
         <th> Destino </th>
@@ -228,8 +217,15 @@ class menuView
         </tr>';
         $content .= $table . $trH;
         foreach ($tickets as $line) {
-            $listing = '<tr>';
-            $listing .= '<td>' . (new DateTime($line['date']))->format('d/m/Y')  . '</td>' . '<td>' . $line['origin'] . '</td>' . '<td>' . $line['destination'] . '</td>' . '<td>' . $line['brand'] . '</td>' . '<td>' . $line['model'] . '</td>' . '<td>' . $line['plate'] . '</td>' .  '<td>' .  $line['distance'] . '</td>' . '<td>' . 'R$ ' . $line['price'] . '</td>';
+            $listing  = '<tr>';
+            $listing .= '<td>' . (new DateTime($line['date']))->format('d/m/Y') . '</td>';
+            $listing .= '<td>' . htmlspecialchars($line['origin'])      . '</td>';
+            $listing .= '<td>' . htmlspecialchars($line['destination'])  . '</td>';
+            $listing .= '<td>' . htmlspecialchars($line['brand'])        . '</td>';
+            $listing .= '<td>' . htmlspecialchars($line['model'])        . '</td>';
+            $listing .= '<td>' . htmlspecialchars($line['plate'])        . '</td>';
+            $listing .= '<td>' . htmlspecialchars($line['distance'])     . '</td>';
+            $listing .= '<td>R$ ' . htmlspecialchars($line['price'])    . '</td>';
             $listing .= '</tr>';
             $content .= $listing;
         }
@@ -238,16 +234,13 @@ class menuView
         include './View/Templates/templateCustomer.php';
     }
 
-
-
-
     public function allTickets($data)
     {
         checkAuth();
         $content = '<div class="FormDireita formbase" style="width: auto;height:auto">
         <h1>Verificar</h1>';
         $table = '<table class="tabelaVerifica" style="margin: 0px 35px;margin-bottom:20px">';
-        $trH = '<tr >
+        $trH   = '<tr>
         <th> Data </th>
         <th> Cliente </th>
         <th> Origem </th>
@@ -259,8 +252,16 @@ class menuView
         </tr>';
         $content .= $table . $trH;
         foreach ($data as $line) {
-            $listing = '<tr>';
-            $listing .= '<td>' . (new DateTime($line['date']))->format('d/m/Y') . '</td>' . '<td>' . $line['name'] . '</td>' .  '<td>' . $line['origin'] . '</td>' . '<td>' . $line['destination'] . '</td>' . '<td>' . $line['brand'] . '</td>' .'<td>' . $line['model'] . '</td>' . '<td>' . $line['plate'] . '</td>' .  '<td>' .  $line['distance'] . '</td>' . '<td>' . 'R$ ' . $line['price'] . '</td>';
+            $listing  = '<tr>';
+            $listing .= '<td>' . (new DateTime($line['date']))->format('d/m/Y') . '</td>';
+            $listing .= '<td>' . htmlspecialchars($line['name'])         . '</td>';
+            $listing .= '<td>' . htmlspecialchars($line['origin'])       . '</td>';
+            $listing .= '<td>' . htmlspecialchars($line['destination'])  . '</td>';
+            $listing .= '<td>' . htmlspecialchars($line['brand'])        . '</td>';
+            $listing .= '<td>' . htmlspecialchars($line['model'])        . '</td>';
+            $listing .= '<td>' . htmlspecialchars($line['plate'])        . '</td>';
+            $listing .= '<td>' . htmlspecialchars($line['distance'])     . '</td>';
+            $listing .= '<td>R$ ' . htmlspecialchars($line['price'])    . '</td>';
             $listing .= '</tr>';
             $content .= $listing;
         }
@@ -269,49 +270,43 @@ class menuView
         include './View/Templates/templateAdm.php';
     }
 
-
-
-    
     public function custormers($data)
     {
         checkAuth();
         $content = '<div class="FormDireita formbase">
         <h1>Listagem</h1>';
         $table = '<table>';
-        $trH = '<tr>
+        $trH   = '<tr>
             <th> Clientes </th>
             <th> E-mail </th>
          </tr>';
         $content .= $table . $trH;
         foreach ($data as $linha) {
-            $listagem = '<tr>';
-            $listagem .= '<td>' . $linha['name'] . '</td>' . '<td>' . $linha['email'] . '</td>';
+            $listagem  = '<tr>';
+            $listagem .= '<td>' . htmlspecialchars($linha['name'])  . '</td>';
+            $listagem .= '<td>' . htmlspecialchars($linha['email']) . '</td>';
             $listagem .= '</tr>';
-            $content .= $listagem;
+            $content  .= $listagem;
         }
         $content .= '</table>';
         $content .= '</div>';
         include './View/Templates/templateAdm.php';
     }
 
-
-
-
-  
     public function listCities($data)
     {
         $city = '';
         foreach ($data as $item) {
-            $city .=  '<option value="' . $item['id'] . '">' . $item['name'] . '</option>';
+            $city .= '<option value="' . (int)$item['id'] . '">' . htmlspecialchars($item['name']) . '</option>';
         }
         return $city;
     }
-    
+
     public function listVehicles($data)
     {
         $vehicle = '';
         foreach ($data as $item) {
-            $vehicle .= '<option value="' . $item['id'] . '">' . $item['brand'] . '</option>';
+            $vehicle .= '<option value="' . (int)$item['id'] . '">' . htmlspecialchars($item['brand']) . '</option>';
         }
         return $vehicle;
     }

@@ -1,14 +1,19 @@
 <?php
-require_once './Model/vehicleModel.php';
-require_once './View/menuView.php';
+
+namespace App\Controller;
+
+use App\Model\Vehicle;
+use App\View\menuView;
+
 class vehicleController
 {
     private $vehicleModel;
     private $vehicleView;
-    
-    public function __construct() {
+
+    public function __construct()
+    {
         $this->vehicleModel = new Vehicle();
-        $this->vehicleView = new menuView();
+        $this->vehicleView  = new menuView();
     }
 
     public function open($message = '', $data = [])
@@ -17,33 +22,31 @@ class vehicleController
         return $this->vehicleView->createVehicle($message, $data);
     }
 
-    public function  register()
+    public function register()
     {
         $brand = $this->sanitizeString($_POST['brand'] ?? '');
         $model = $this->sanitizeString($_POST['model'] ?? '');
         $plate = $this->sanitizeString($_POST['plate'] ?? '');
-        $year = $this->sanitizeString($_POST['year'] ?? '');
+        $year  = $this->sanitizeString($_POST['year'] ?? '');
 
         if (!$brand || !$model || !$plate || !$year) {
-
             $this->open('Preencha todos os dados.');
             return;
         }
-        
+
         $this->vehicleModel->setBrand($brand);
         $this->vehicleModel->setModel($model);
         $this->vehicleModel->setPlate($plate);
         $this->vehicleModel->setYear($year);
-        
+
         if (!$this->vehicleModel->register()) {
-             $this->open('Erro ao registrar veículo');
-             return;
+            $this->open('Erro ao registrar veículo');
+            return;
         }
-        
-        $data = $this->vehicleModel->all();
-        return $this->open('Veículo registrado com sucesso.', $data);
+
+        return $this->open('Veículo registrado com sucesso.');
     }
-    
+
     private function sanitizeString(?string $string): string
     {
         return htmlspecialchars(strip_tags($string ?? ''), ENT_QUOTES, 'UTF-8');

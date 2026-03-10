@@ -1,13 +1,13 @@
 <?php
+
+namespace App\View;
+
 class cadUsuarioView
 {
+    public function __construct() {}
 
-    public function __construct()
-    { 
-
-    }
-  
-    public function formLogin(string $message){
+    public function formLogin(string $message)
+    {
         $content = "<form action='/login/login' method='POST'>
         <h1>Login</h1><br>
         {$message}
@@ -16,24 +16,23 @@ class cadUsuarioView
         <button>Entrar</button><br>
         <a href='/user/register'> Ainda não é cliente?<strong>Cadastre-se!</strong>
     </form>";
-    include './View/Templates/templateUser.php';
+        include './View/Templates/templateUser.php';
     }
 
     public function formRegister(string $message)
     {
         $content = "
-        <form action='/user/register' method='POST'> 
+        <form action='/user/register' method='POST'>
          <h1>Cadastro</h1><br>
          {$message}
             <input type='text' name='name' id='name' placeholder='Digite o seu nome' required>
-            <input type='email' name='email' id='email'  placeholder='Digite o seu email'required><br>
-            <input type='password' name='password' id='password' placeholder='Digite uma senha'required> <br>
-            <input type='password' name='confirmPassword' id='confirmPassword' placeholder='Confirme a senha'required> <br>
+            <input type='email' name='email' id='email'  placeholder='Digite o seu email' required><br>
+            <input type='password' name='password' id='password' placeholder='Digite uma senha' required> <br>
+            <input type='password' name='confirmPassword' id='confirmPassword' placeholder='Confirme a senha' required> <br>
             <button>Registrar</button><br>
             <a href='/login'><strong>Voltar</strong>
         </form>
     ";
         include './View/Templates/templateUser.php';
     }
-    
 }

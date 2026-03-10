@@ -1,6 +1,10 @@
 <?php
-require_once './View/menuView.php';
-require_once './Model/cityModel.php';
+
+namespace App\Controller;
+
+use App\Model\City;
+use App\View\menuView;
+
 class cityController
 {
     private $cityModel;
@@ -9,7 +13,7 @@ class cityController
     public function __construct()
     {
         $this->cityModel = new City();
-        $this->cityView = new menuView();
+        $this->cityView  = new menuView();
     }
 
     public function open($message = '', $data = [])
@@ -23,7 +27,6 @@ class cityController
         $name = $this->sanitizeString($_POST['name'] ?? '');
 
         if (!$name) {
-
             return $this->open('Preencha todos os dados.');
         }
 
@@ -33,8 +36,7 @@ class cityController
             return $this->open('Erro ao registrar cidade');
         }
 
-        $data = $this->cityModel->all();
-        return $this->open('Cidade registrada com sucesso!', $data);
+        return $this->open('Cidade registrada com sucesso!');
     }
 
     public function delete()
@@ -43,7 +45,7 @@ class cityController
 
         if (!$this->cityModel->delete($id)) {
             return $this->open('Erro ao excluir cidade.');
-        };
+        }
 
         return $this->open('Cidade excluida.');
     }
@@ -51,23 +53,23 @@ class cityController
     public function show()
     {
         $id = $this->sanitizeString($_GET['id'] ?? '');
+
         if (!$id) {
             return $this->open('Erro ao editar cidade.');
         }
+
         $data = $this->cityModel->show($id);
-        
         return $this->cityView->editCity($data);
     }
-    
+
     public function all()
     {
-        $data = $this->cityModel->all();
-        return $data;
+        return $this->cityModel->all();
     }
-    
+
     public function edit()
     {
-        $id = $this->sanitizeString($_GET['id'] ?? '');
+        $id   = $this->sanitizeString($_GET['id'] ?? '');
         $name = $this->sanitizeString($_POST['name'] ?? '');
 
         if (!$name) {
@@ -78,11 +80,10 @@ class cityController
             return $this->open('Erro ao editar cidade.');
         }
 
-        $data = $this->cityModel->all();
-        return $this->open('Cidade editada com sucesso!', $data);
+        return $this->open('Cidade editada com sucesso!');
     }
 
-    private function sanitizeString($string)
+    private function sanitizeString($string): string
     {
         return htmlspecialchars($string, ENT_QUOTES, 'UTF-8');
     }
