@@ -2,7 +2,7 @@
 
 namespace App\Model;
 
-use Connection;
+use App\Database\Connection;
 use PDO;
 use PDOException;
 
@@ -10,28 +10,18 @@ class Login
 {
     private $email;
     private $password;
+    private $pdo;
 
-    public function __construct() {}
-
-    public function getEmail()
+    public function __construct(?PDO $pdo = null)
     {
-        return $this->email;
+        $this->pdo = $pdo ?? Connection::getInstance();
     }
 
-    public function setEmail($email)
-    {
-        $this->email = $email;
-    }
+    public function getEmail()        { return $this->email; }
+    public function setEmail($email)  { $this->email = $email; }
 
-    public function getPassword()
-    {
-        return $this->password;
-    }
-
-    public function setPassword($password)
-    {
-        $this->password = $password;
-    }
+    public function getPassword()           { return $this->password; }
+    public function setPassword($password)  { $this->password = $password; }
 
     public function login($email, $password)
     {
@@ -39,28 +29,20 @@ class Login
             session_start();
         }
 
-        $connection = new Connection();
-        $pdo = $connection->connect();
-
-        if (!$pdo) {
-            error_log("Falha ao conectar ao banco de dados.");
-            return false;
-        }
-
         try {
-            $sql = $pdo->prepare("SELECT * FROM users WHERE email = :email;");
+            $sql = $this->pdo->prepare("SELECT * FROM users WHERE email = :email;");
             $sql->bindValue(":email", $email);
             $sql->execute();
 
             if ($sql->rowCount() > 0) {
-                $query = $sql->fetchAll(PDO::FETCH_ASSOC);
+                $query          = $sql->fetchAll(PDO::FETCH_ASSOC);
                 $hashedPassword = $query[0]['password'];
 
                 if (password_verify($password, $hashedPassword)) {
-                    $_SESSION['idUser'] = $query[0]['id'];
-                    $_SESSION['email'] = $query[0]['email'];
+                    $_SESSION['idUser']  = $query[0]['id'];
+                    $_SESSION['email']   = $query[0]['email'];
                     $_SESSION['profile'] = $query[0]['profile'];
-                    $_SESSION['name'] = $query[0]['name'];
+                    $_SESSION['name']    = $query[0]['name'];
                     return true;
                 }
             }

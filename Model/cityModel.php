@@ -2,7 +2,7 @@
 
 namespace App\Model;
 
-use Connection;
+use App\Database\Connection;
 use PDO;
 use PDOException;
 
@@ -12,41 +12,20 @@ class City
     private $name;
     private $pdo;
 
-    public function __construct()
+    public function __construct(?PDO $pdo = null)
     {
-        $connection = new Connection();
-        $this->pdo = $connection->connect();
-
-        if (!$this->pdo) {
-            error_log("Falha ao conectar ao banco de dados.");
-        }
+        $this->pdo = $pdo ?? Connection::getInstance();
     }
 
-    public function getId()
-    {
-        return $this->id;
-    }
-
-    public function setId($id)
-    {
-        $this->id = $id;
-    }
-
-    public function getName()
-    {
-        return $this->name;
-    }
-
-    public function setName($name)
-    {
-        $this->name = $name;
-    }
+    public function getId()      { return $this->id; }
+    public function setId($id)   { $this->id = $id; }
+    public function getName()    { return $this->name; }
+    public function setName($name) { $this->name = $name; }
 
     public function register()
     {
         try {
-            $sql = 'INSERT INTO cities (name) VALUES (?);';
-            $pre = $this->pdo->prepare($sql);
+            $pre = $this->pdo->prepare('INSERT INTO cities (name) VALUES (?);');
             $pre->bindValue(1, $this->name);
 
             if ($pre->execute()) {
@@ -64,7 +43,7 @@ class City
     public function all()
     {
         try {
-            $sql = 'SELECT * FROM cities WHERE status = 1 ORDER BY name ASC;';
+            $sql  = 'SELECT * FROM cities WHERE status = 1 ORDER BY name ASC;';
             $data = $this->pdo->query($sql);
 
             if ($data) {
@@ -97,8 +76,7 @@ class City
     public function delete($id)
     {
         try {
-            $sql = 'UPDATE cities SET status = 0 WHERE id = :id;';
-            $pre = $this->pdo->prepare($sql);
+            $pre = $this->pdo->prepare('UPDATE cities SET status = 0 WHERE id = :id;');
             $pre->bindValue(":id", $id);
 
             if ($pre->execute()) {
@@ -116,8 +94,7 @@ class City
     public function edit($id, $name)
     {
         try {
-            $sql = 'UPDATE cities SET name = :name WHERE id = :id;';
-            $pre = $this->pdo->prepare($sql);
+            $pre = $this->pdo->prepare('UPDATE cities SET name = :name WHERE id = :id;');
             $pre->bindValue(":id", $id);
             $pre->bindValue(":name", $name);
 

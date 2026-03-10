@@ -2,7 +2,7 @@
 
 namespace App\Model;
 
-use Connection;
+use App\Database\Connection;
 use PDO;
 use PDOException;
 
@@ -18,101 +18,34 @@ class Ticket
     private $date;
     private $pdo;
 
-    public function __construct()
+    public function __construct(?PDO $pdo = null)
     {
-        $connection = new Connection();
-        $this->pdo = $connection->connect();
-
-        if (!$this->pdo) {
-            error_log("Falha ao conectar ao banco de dados.");
-        }
+        $this->pdo = $pdo ?? Connection::getInstance();
     }
 
-    public function getId()
-    {
-        return $this->id;
-    }
-
-    public function setId($id)
-    {
-        $this->id = $id;
-    }
-
-    public function getPassenger()
-    {
-        return $this->passenger;
-    }
-
-    public function setPassenger($passenger)
-    {
-        $this->passenger = $passenger;
-    }
-
-    public function getRoute()
-    {
-        return $this->route;
-    }
-
-    public function setRoute($route)
-    {
-        $this->route = $route;
-    }
-
-    public function getVehicle()
-    {
-        return $this->vehicle;
-    }
-
-    public function setVehicle($vehicle)
-    {
-        $this->vehicle = $vehicle;
-    }
-
-    public function getOrigin()
-    {
-        return $this->origin;
-    }
-
-    public function setOrigin($origin)
-    {
-        $this->origin = $origin;
-    }
-
-    public function getDestination()
-    {
-        return $this->destination;
-    }
-
-    public function setDestination($destination)
-    {
-        $this->destination = $destination;
-    }
-
-    public function getPrice()
-    {
-        return $this->price;
-    }
-
-    public function setPrice($price)
-    {
-        $this->price = $price;
-    }
-
-    public function getDate()
-    {
-        return $this->date;
-    }
-
-    public function setDate($date)
-    {
-        $this->date = $date;
-    }
+    public function getId()            { return $this->id; }
+    public function setId($id)         { $this->id = $id; }
+    public function getPassenger()     { return $this->passenger; }
+    public function setPassenger($v)   { $this->passenger = $v; }
+    public function getRoute()         { return $this->route; }
+    public function setRoute($v)       { $this->route = $v; }
+    public function getVehicle()       { return $this->vehicle; }
+    public function setVehicle($v)     { $this->vehicle = $v; }
+    public function getOrigin()        { return $this->origin; }
+    public function setOrigin($v)      { $this->origin = $v; }
+    public function getDestination()   { return $this->destination; }
+    public function setDestination($v) { $this->destination = $v; }
+    public function getPrice()         { return $this->price; }
+    public function setPrice($v)       { $this->price = $v; }
+    public function getDate()          { return $this->date; }
+    public function setDate($v)        { $this->date = $v; }
 
     public function register()
     {
         try {
-            $sql = 'INSERT INTO tickets (passenger, route, vehicle, price, date) VALUES (?, ?, ?, ?, ?);';
-            $pre = $this->pdo->prepare($sql);
+            $pre = $this->pdo->prepare(
+                'INSERT INTO tickets (passenger, route, vehicle, price, date) VALUES (?, ?, ?, ?, ?);'
+            );
             $pre->bindValue(1, $this->passenger);
             $pre->bindValue(2, $this->route);
             $pre->bindValue(3, $this->vehicle);
@@ -159,7 +92,7 @@ class Ticket
     public function all()
     {
         try {
-            $sql = 'SELECT u.name AS name, t.date AS date, t.price AS price,
+            $sql  = 'SELECT u.name AS name, t.date AS date, t.price AS price,
                            co.name AS origin, cd.name AS destination, r.distance AS distance,
                            v.brand AS brand, v.model AS model, v.plate AS plate
                     FROM tickets t
