@@ -4,6 +4,8 @@ require_once './View/cadUsuarioView.php';
 
 class userController
 {
+    use SanitizeTrait;
+
     private $userModel;
     private $userView;
     public function __construct()
@@ -57,11 +59,6 @@ class userController
     private function checkPassword(string $password, string $confirmPassword): bool
     {
         return $password === $confirmPassword;
-    }
-    
-    private function sanitizeString(?string $string): string
-    {
-        return htmlspecialchars(strip_tags($string ?? ''), ENT_QUOTES, 'UTF-8');
     }
     
     private function hashPassword(string $password): string

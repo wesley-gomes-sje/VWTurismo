@@ -3,6 +3,8 @@ require_once './View/menuView.php';
 require_once './Model/cityModel.php';
 class cityController
 {
+    use SanitizeTrait;
+
     private $cityModel;
     private $cityView;
 
@@ -82,8 +84,4 @@ class cityController
         return $this->open('Cidade editada com sucesso!', $data);
     }
 
-    private function sanitizeString($string)
-    {
-        return htmlspecialchars($string, ENT_QUOTES, 'UTF-8');
-    }
 }

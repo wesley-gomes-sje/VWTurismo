@@ -8,6 +8,8 @@ require_once './View/menuView.php';
 
 class ticketsController
 {
+    use SanitizeTrait;
+
     private $ticketModel;
     private $routeModel;
     private $ticketView;
@@ -75,8 +77,4 @@ class ticketsController
         return $this->ticketView->all($tickets);
     }
     
-    private function sanitizeString(?string $string): string
-    {
-        return htmlspecialchars(strip_tags($string ?? ''), ENT_QUOTES, 'UTF-8');
-    }
 }

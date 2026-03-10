@@ -3,6 +3,8 @@ require_once './Model/vehicleModel.php';
 require_once './View/menuView.php';
 class vehicleController
 {
+    use SanitizeTrait;
+
     private $vehicleModel;
     private $vehicleView;
     
@@ -44,8 +46,4 @@ class vehicleController
         return $this->open('Veículo registrado com sucesso.', $data);
     }
     
-    private function sanitizeString(?string $string): string
-    {
-        return htmlspecialchars(strip_tags($string ?? ''), ENT_QUOTES, 'UTF-8');
-    }
 }
