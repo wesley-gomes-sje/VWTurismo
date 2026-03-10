@@ -19,6 +19,7 @@
         <include>
             <directory suffix=".php">Database</directory>
             <directory suffix=".php">Model</directory>
+            <file>Router.php</file>
         </include>
     </source>
 

@@ -15,7 +15,8 @@
         },
         "classmap": [
             "connection.php",
-            "Model/"
+            "Model/",
+            "Router.php"
         ],
         "files": [
             "auth.php"

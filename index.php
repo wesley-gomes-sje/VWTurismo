@@ -2,27 +2,17 @@
 
 require_once __DIR__ . '/vendor/autoload.php';
 
-if (session_status() === PHP_SESSION_NONE) {
+if (session_status() !== PHP_SESSION_ACTIVE) {
     session_start();
 }
 
-use App\Controller\loginController;
+$router = new Router(function () {
+    (new App\Controller\loginController())->fillLogin();
+});
 
-$url      = isset($_GET['url']) ? $_GET['url'] : '';
-$urlArray = explode('/', $url);
+require_once __DIR__ . '/routes/web.php';
 
-$controllerName       = !empty($urlArray[0]) ? $urlArray[0] . 'Controller' : 'loginController';
-$metodo               = !empty($urlArray[1]) ? $urlArray[1] : 'fillLogin';
-$fullyQualifiedClass  = 'App\\Controller\\' . $controllerName;
+$method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
+$uri    = $_SERVER['REQUEST_URI']    ?? '/login';
 
-if (class_exists($fullyQualifiedClass) && method_exists($fullyQualifiedClass, $metodo)) {
-    $obj = new $fullyQualifiedClass();
-    $obj->$metodo();
-} else {
-    $controller = new loginController();
-    $controller->fillLogin();
-}
-
-if ($_SERVER['REQUEST_URI'] === '/logout') {
-    require_once __DIR__ . '/logout.php';
-}
+$router->dispatch($method, $uri);
