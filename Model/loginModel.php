@@ -49,6 +49,7 @@ class Login
                 $hashedPassword = $query[0]['password'];
                 
                 if (password_verify($password, $hashedPassword)) {
+                    session_regenerate_id(true);
                     $_SESSION['idUser'] = $query[0]['id'];
                     $_SESSION['email'] = $query[0]['email'];
                     $_SESSION['profile'] = $query[0]['profile'];

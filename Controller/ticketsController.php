@@ -15,8 +15,7 @@ class ticketsController
     private $cityModel;
     private $passenger;
     public function __construct()
-    { 
-        checkAuth();
+    {
         $this->vehicleModel = new Vehicle();
         $this->ticketView = new menuView();
         $this->ticketModel = new Ticket();
