@@ -44,6 +44,11 @@ class userController
             return;
         }
 
+        if ($this->userModel->show($email)) {
+            $this->fillFields('E-mail já cadastrado.');
+            return;
+        }
+
         $hashedPassword = $this->hashPassword($password);
 
         $this->userModel->setName($name);
