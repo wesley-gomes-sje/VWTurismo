@@ -72,11 +72,21 @@ Saída esperada:
 ```
 Iniciando a criação de todas as tabelas...
 Todas as tabelas foram criadas com sucesso.
+Seed: usuário admin criado com sucesso.
+  E-mail: admin@vwturismo.com
+  Senha:  admin123
 ```
 
 ### 6. Acesse a aplicação
 
 Abra no navegador: [http://localhost:8080](http://localhost:8080)
+
+Login padrão do admin criado pelo seed:
+
+| Campo | Valor |
+|-------|-------|
+| E-mail | `admin@vwturismo.com` |
+| Senha | `admin123` |
 
 ---
 
