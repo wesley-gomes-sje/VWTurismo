@@ -1,5 +1,7 @@
 <?php
-require_once './connection.php';
+
+use App\Database\Connection;
+
 class Route
 {
     private $id;
@@ -7,106 +9,60 @@ class Route
     private $destination;
     private $distance;
     private $pdo;
-    
-    public function __construct()
-    { 
-        $connection = new Connection();
-        $this->pdo = $connection->connect();       
-         
-        if (!$this->pdo) {
-            echo "Falha ao conectar ao banco de dados.";
-            return false;
-        }
-    }
-    public function getId()
+
+    public function __construct(?PDO $pdo = null)
     {
-        return $this->id;
-    }
-    public function setId($id)
-    {
-        $this->id = $id;
+        $this->pdo = $pdo ?? Connection::getInstance();
     }
 
-    public function getOrigin()
-    {
-        return $this->origin;
-    }
-    public function setOrigin($origin)
-    {
-        $this->origin = $origin;
-    }
-    public function getDestination()
-    {
-        return $this->destination;
-    }
-    public function setDestination($destination)
-    {
-        $this->destination = $destination;
-    }
-    public function getDistance()
-    {
-        return $this->distance;
-    }
-    public function setDistance($distance)
-    {
-        $this->distance = $distance;
-    }
-    
+    public function getId()            { return $this->id; }
+    public function setId($id)         { $this->id = $id; }
+    public function getOrigin()        { return $this->origin; }
+    public function setOrigin($v)      { $this->origin = $v; }
+    public function getDestination()   { return $this->destination; }
+    public function setDestination($v) { $this->destination = $v; }
+    public function getDistance()      { return $this->distance; }
+    public function setDistance($v)    { $this->distance = $v; }
+
     public function register()
     {
         try {
-            $sql = 'INSERT INTO routes (origin,destination,distance) VALUES (?,?,?);';
-            $pre = $this->pdo->prepare($sql);
+            $pre = $this->pdo->prepare('INSERT INTO routes (origin, destination, distance) VALUES (?, ?, ?);');
             $pre->bindValue(1, $this->origin);
             $pre->bindValue(2, $this->destination);
             $pre->bindValue(3, $this->distance);
-            
-            if ($pre->execute()) {
-                return true;
-            } else {
-                print_r($pre->errorInfo());
-            }
-        } catch (PDOException $erroRegister) {
-            echo $erroRegister->getMessage();
+            return $pre->execute() ? true : false;
+        } catch (PDOException $e) {
+            error_log('Route::register — ' . $e->getMessage());
             return false;
         }
     }
-    
+
     public function all()
     {
         try {
-            $sql = 'SELECT cO.name AS origin,cD.name AS destination,r.distance AS distance  
-            FROM  cities cO  
-            INNER JOIN routes r ON cO.id=r.origin 
-            INNER JOIN cities cD ON cD.id=r.destination;';
+            $sql = 'SELECT cO.name AS origin, cD.name AS destination, r.distance
+                    FROM cities cO
+                    INNER JOIN routes r  ON cO.id = r.origin
+                    INNER JOIN cities cD ON cD.id = r.destination;';
             $data = $this->pdo->query($sql);
-
-            if ($data) {
-                return $data->fetchAll(PDO::FETCH_ASSOC);
-                
-            } else {
-                return array('response' => 'erro');
-            }
-        } catch (PDOException $errorAll) {
-            echo $errorAll->getMessage();
+            return $data ? $data->fetchAll(PDO::FETCH_ASSOC) : false;
+        } catch (PDOException $e) {
+            error_log('Route::all — ' . $e->getMessage());
             return false;
         }
     }
-    
+
     public function check($origin, $destination)
     {
         try {
-            $sql = 'SELECT id, distance FROM routes WHERE origin = ? AND destination = ?;';
-            $pre = $this->pdo->prepare($sql);
+            $pre = $this->pdo->prepare('SELECT id, distance FROM routes WHERE origin = ? AND destination = ?;');
             $pre->bindValue(1, $origin);
             $pre->bindValue(2, $destination);
-            if ($pre->execute()) {
-                return $pre->fetch(PDO::FETCH_ASSOC);
-            } else {
-                print_r($pre->errorInfo());
-            }
-        } catch (PDOException $errorCheck) {
-            echo $errorCheck->getMessage();
+            $pre->execute();
+            return $pre->fetch(PDO::FETCH_ASSOC) ?: false;
+        } catch (PDOException $e) {
+            error_log('Route::check — ' . $e->getMessage());
             return false;
         }
     }

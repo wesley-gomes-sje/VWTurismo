@@ -1,123 +1,80 @@
 <?php
-require_once './connection.php';
+
+use App\Database\Connection;
+
 class City
 {
     private $id;
     private $name;
     private $pdo;
 
-    public function __construct()
+    public function __construct(?PDO $pdo = null)
     {
-        $connection = new Connection();
-        $this->pdo = $connection->connect();
+        $this->pdo = $pdo ?? Connection::getInstance();
+    }
 
-        if (!$this->pdo) {
-            echo "Falha ao conectar ao banco de dados.";
-            return false;
-        }
-    }
-    public function getId()
-    {
-        return $this->id;
-    }
-    public function setId($id)
-    {
-        $this->id = $id;
-    }
-    public function getName()
-    {
-        return $this->name;
-    }
-    public function setName($name)
-    {
-        $this->name = $name;
-    }
+    public function getId()      { return $this->id; }
+    public function setId($id)   { $this->id = $id; }
+    public function getName()    { return $this->name; }
+    public function setName($n)  { $this->name = $n; }
+
     public function register()
     {
         try {
-            $sql = 'INSERT INTO cities (name) VALUES (?);';
-            $pre = $this->pdo->prepare($sql);
+            $pre = $this->pdo->prepare('INSERT INTO cities (name) VALUES (?);');
             $pre->bindValue(1, $this->name);
-            
-            if ($pre->execute()) {
-                return true;
-            } else {
-                print_r($pre->errorInfo());
-            }
-        } catch (PDOException $errorRegister) {
-            echo $errorRegister->getMessage();
+            return $pre->execute() ? true : false;
+        } catch (PDOException $e) {
+            error_log('City::register — ' . $e->getMessage());
             return false;
         }
     }
-    
+
     public function all()
     {
         try {
-            $sql = 'SELECT  * FROM cities WHERE status= 1 order by name ASC;';
-            $data = $this->pdo->query($sql);
-
-            if ($data) {
-                return $data->fetchAll(PDO::FETCH_ASSOC);
-            } else {
-                return array('response' => 'erro');
-            }
-        } catch (PDOException $errorAll) {
-            echo $errorAll->getMessage();
-            return array('response' => 'erro');
+            $data = $this->pdo->query('SELECT * FROM cities WHERE status = 1 ORDER BY name ASC;');
+            return $data ? $data->fetchAll(PDO::FETCH_ASSOC) : [];
+        } catch (PDOException $e) {
+            error_log('City::all — ' . $e->getMessage());
+            return [];
         }
     }
-    
+
     public function show($id)
     {
         try {
-            $sql = $this->pdo->prepare("SELECT id,name FROM cities WHERE id=:id;");
-            $sql->bindValue(":id", $id);
+            $sql = $this->pdo->prepare('SELECT id, name FROM cities WHERE id = :id;');
+            $sql->bindValue(':id', $id);
             $sql->execute();
-            if ($sql->rowCount() > 0) {
-                $query = $sql->fetchAll(PDO::FETCH_ASSOC);
-                return $query;
-            } else {
-                return array('response' => 'erro');
-            }
-        } catch (PDOException $errorShow) {
-            echo $errorShow->getMessage();
+            return $sql->rowCount() > 0 ? $sql->fetchAll(PDO::FETCH_ASSOC) : false;
+        } catch (PDOException $e) {
+            error_log('City::show — ' . $e->getMessage());
             return false;
         }
     }
-    
+
     public function delete($id)
     {
         try {
-            $sql = 'UPDATE cities SET status=0 WHERE id=:id;';
-            $pre = $this->pdo->prepare($sql);
-            $pre->bindValue(":id", $id);
-            if ($pre->execute()) {
-                return true;
-            } else {
-                print_r($pre->errorInfo());
-                return false;
-            }
-        } catch (PDOException $errorDelete) {
-            echo $errorDelete->getMessage();
+            $pre = $this->pdo->prepare('UPDATE cities SET status = 0 WHERE id = :id;');
+            $pre->bindValue(':id', $id);
+            return $pre->execute() ? true : false;
+        } catch (PDOException $e) {
+            error_log('City::delete — ' . $e->getMessage());
             return false;
         }
     }
-    
+
     public function edit($id, $name)
     {
         try {
-            $sql = 'UPDATE cities SET name= :name WHERE id= :id;';
-            $pre = $this->pdo->prepare($sql);
-            $pre->bindValue(":id", $id);
-            $pre->bindValue(":name", $name);
-            if ($pre->execute()) {
-                return true;
-            } else {
-                print_r($pre->errorInfo());
-                return false;
-            }
-        } catch (PDOException $errorEdit) {
-            echo $errorEdit->getMessage();
+            $pre = $this->pdo->prepare('UPDATE cities SET name = :name WHERE id = :id;');
+            $pre->bindValue(':id', $id);
+            $pre->bindValue(':name', $name);
+            return $pre->execute() ? true : false;
+        } catch (PDOException $e) {
+            error_log('City::edit — ' . $e->getMessage());
             return false;
         }
     }
