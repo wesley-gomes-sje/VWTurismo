@@ -22,7 +22,7 @@
 | Banco | MySQL via PDO |
 | Autenticação atual | Session (`$_SESSION`) |
 | `vlucas/phpdotenv` | Carrega variáveis do `.env` |
-| `firebase/php-jwt` | Instalado, **ainda não usado** — decisão pendente (Etapa 8) |
+| `firebase/php-jwt` | **Removido na Etapa 8** — não utilizado; autenticação permanece Session |
 | `phpunit/phpunit ^11` | Testes unitários (adicionado na Etapa 2) |
 
 ---
@@ -157,9 +157,9 @@ public function __construct(?PDO $pdo = null)
 | 3 | Roteador simples com mapeamento explícito | ✅ Concluída | `refactor/etapa-3-router` | [#5](https://github.com/wesley-gomes-sje/VWTurismo/pull/5) |
 | 4 | Autenticação e Middleware | ✅ Concluída | `refactor/etapa-4-auth-middleware` | [#6](https://github.com/wesley-gomes-sje/VWTurismo/pull/6) |
 | 5 | Refatorar Models (responsabilidade única) | ✅ Concluída | `refactor/etapa-5-models` | [#7](https://github.com/wesley-gomes-sje/VWTurismo/pull/7) |
-| 6 | Refatorar Controllers (extrair helpers) | ⏳ Pendente | — | — |
-| 7 | Refatorar Views (templates reais, sem concatenação) | ⏳ Pendente | — | — |
-| 8 | Limpeza final (JWT, CSRF, código morto) | ⏳ Pendente | — | — |
+| 6 | Refatorar Controllers (extrair helpers) | ✅ Concluída | `refactor/etapa-6-controllers` | — |
+| 7 | Refatorar Views (templates reais, sem concatenação) | ✅ Concluída | `refactor/etapa-7-views` | — |
+| 8 | Limpeza final (JWT removido, stubs deletados) | ✅ Concluída | `refactor/etapa-8-cleanup` | — |
 
 ---
 
