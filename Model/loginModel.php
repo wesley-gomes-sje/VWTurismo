@@ -1,34 +1,45 @@
 <?php
-require_once './connection.php';
+
+namespace App\Model;
+
+use Connection;
+use PDO;
+use PDOException;
+
 class Login
 {
     private $email;
     private $password;
+
     public function __construct() {}
-    
+
     public function getEmail()
     {
         return $this->email;
     }
+
     public function setEmail($email)
     {
         $this->email = $email;
     }
+
     public function getPassword()
     {
         return $this->password;
     }
+
     public function setPassword($password)
     {
         $this->password = $password;
     }
+
     public function login($email, $password)
     {
-        if(session_status() !== PHP_SESSION_ACTIVE){
+        if (session_status() !== PHP_SESSION_ACTIVE) {
             session_start();
         }
-        
-        $connection = new connection();
+
+        $connection = new Connection();
         $pdo = $connection->connect();
 
         if (!$pdo) {
@@ -37,17 +48,14 @@ class Login
         }
 
         try {
-
-            $sql = $pdo->prepare("SELECT *
-            FROM users 
-            WHERE email = :email;");
+            $sql = $pdo->prepare("SELECT * FROM users WHERE email = :email;");
             $sql->bindValue(":email", $email);
             $sql->execute();
 
             if ($sql->rowCount() > 0) {
                 $query = $sql->fetchAll(PDO::FETCH_ASSOC);
                 $hashedPassword = $query[0]['password'];
-                
+
                 if (password_verify($password, $hashedPassword)) {
                     $_SESSION['idUser'] = $query[0]['id'];
                     $_SESSION['email'] = $query[0]['email'];
@@ -56,10 +64,11 @@ class Login
                     return true;
                 }
             }
+
             error_log("Usuário ou senha incorretos.");
             return false;
         } catch (PDOException $e) {
-            echo "Erro ao realizar o login: " . $e->getMessage();
+            error_log("Erro ao realizar o login: " . $e->getMessage());
             return false;
         }
     }

@@ -1,9 +1,13 @@
 <?php
-require_once './connection.php';
+
+namespace App\Model;
+
+use Connection;
+use PDO;
+use PDOException;
 
 class Ticket
 {
-
     private $id;
     private $passenger;
     private $route;
@@ -14,22 +18,21 @@ class Ticket
     private $date;
     private $pdo;
 
-
     public function __construct()
     {
-
         $connection = new Connection();
         $this->pdo = $connection->connect();
 
         if (!$this->pdo) {
-            echo "Falha ao conectar ao banco de dados.";
-            return false;
+            error_log("Falha ao conectar ao banco de dados.");
         }
     }
+
     public function getId()
     {
         return $this->id;
     }
+
     public function setId($id)
     {
         $this->id = $id;
@@ -39,6 +42,7 @@ class Ticket
     {
         return $this->passenger;
     }
+
     public function setPassenger($passenger)
     {
         $this->passenger = $passenger;
@@ -48,6 +52,7 @@ class Ticket
     {
         return $this->route;
     }
+
     public function setRoute($route)
     {
         $this->route = $route;
@@ -57,6 +62,7 @@ class Ticket
     {
         return $this->vehicle;
     }
+
     public function setVehicle($vehicle)
     {
         $this->vehicle = $vehicle;
@@ -66,6 +72,7 @@ class Ticket
     {
         return $this->origin;
     }
+
     public function setOrigin($origin)
     {
         $this->origin = $origin;
@@ -75,6 +82,7 @@ class Ticket
     {
         return $this->destination;
     }
+
     public function setDestination($destination)
     {
         $this->destination = $destination;
@@ -84,6 +92,7 @@ class Ticket
     {
         return $this->price;
     }
+
     public function setPrice($price)
     {
         $this->price = $price;
@@ -93,6 +102,7 @@ class Ticket
     {
         return $this->date;
     }
+
     public function setDate($date)
     {
         $this->date = $date;
@@ -100,22 +110,23 @@ class Ticket
 
     public function register()
     {
-
         try {
-            $sql = 'INSERT INTO tickets (passenger,route,vehicle,price,date) VALUES (?,?,?,?,?);';
+            $sql = 'INSERT INTO tickets (passenger, route, vehicle, price, date) VALUES (?, ?, ?, ?, ?);';
             $pre = $this->pdo->prepare($sql);
             $pre->bindValue(1, $this->passenger);
             $pre->bindValue(2, $this->route);
             $pre->bindValue(3, $this->vehicle);
             $pre->bindValue(4, $this->price);
             $pre->bindValue(5, $this->date);
+
             if ($pre->execute()) {
                 return true;
-            } else {
-                print_r($pre->errorInfo());
             }
-        } catch (PDOException $errorRegister) {
-            echo $errorRegister->getMessage();
+
+            error_log("Erro ao registrar passagem: " . implode(', ', $pre->errorInfo()));
+            return false;
+        } catch (PDOException $e) {
+            error_log("Erro ao registrar passagem: " . $e->getMessage());
             return false;
         }
     }
@@ -123,22 +134,24 @@ class Ticket
     public function show($id)
     {
         try {
-            $sql = 'SELECT  t.date AS date, t.price AS price, co.name AS origin, cd.name AS destination, r.distance AS distance
-            FROM tickets t
-            INNER JOIN routes r ON t.route=r.id
-            INNER JOIN cities co ON r.origin=co.id
-            INNER JOIN cities cd ON r.destination=cd.id
-            INNER JOIN users u ON t.passenger=u.id           
-            WHERE id = ?;';
+            $sql = 'SELECT t.date AS date, t.price AS price, co.name AS origin, cd.name AS destination, r.distance AS distance
+                    FROM tickets t
+                    INNER JOIN routes r ON t.route = r.id
+                    INNER JOIN cities co ON r.origin = co.id
+                    INNER JOIN cities cd ON r.destination = cd.id
+                    INNER JOIN users u ON t.passenger = u.id
+                    WHERE t.id = ?;';
             $pre = $this->pdo->prepare($sql);
             $pre->bindValue(1, $id);
+
             if ($pre->execute()) {
                 return $pre->fetch(PDO::FETCH_ASSOC);
-            } else {
-                print_r($pre->errorInfo());
             }
-        } catch (PDOException $errorShow) {
-            echo $errorShow->getMessage();
+
+            error_log("Erro ao buscar passagem: " . implode(', ', $pre->errorInfo()));
+            return false;
+        } catch (PDOException $e) {
+            error_log("Erro ao buscar passagem: " . $e->getMessage());
             return false;
         }
     }
@@ -146,50 +159,55 @@ class Ticket
     public function all()
     {
         try {
-            $sql = 'SELECT u.name AS name, t.date AS date, t.price AS price, co.name AS origin, cd.name AS destination, r.distance AS distance, v.brand AS brand, v.model AS model, v.plate AS plate
-            FROM tickets t
-            INNER JOIN routes r ON t.route=r.id
-            INNER JOIN cities co ON r.origin=co.id
-            INNER JOIN cities cd ON r.destination=cd.id
-            INNER JOIN users u ON t.passenger=u.id
-              INNER JOIN vehicles v ON t.vehicle=v.id  
-            ORDER BY t.date DESC;';
+            $sql = 'SELECT u.name AS name, t.date AS date, t.price AS price,
+                           co.name AS origin, cd.name AS destination, r.distance AS distance,
+                           v.brand AS brand, v.model AS model, v.plate AS plate
+                    FROM tickets t
+                    INNER JOIN routes r ON t.route = r.id
+                    INNER JOIN cities co ON r.origin = co.id
+                    INNER JOIN cities cd ON r.destination = cd.id
+                    INNER JOIN users u ON t.passenger = u.id
+                    INNER JOIN vehicles v ON t.vehicle = v.id
+                    ORDER BY t.date DESC;';
             $data = $this->pdo->query($sql);
 
             if ($data) {
                 return $data->fetchAll(PDO::FETCH_ASSOC);
-            } else {
-                return array('resposta' => 'erro');
             }
-        } catch (PDOException $errorAll) {
-            return array('resposta' => 'erro');
+            return [];
+        } catch (PDOException $e) {
+            error_log("Erro ao listar passagens: " . $e->getMessage());
+            return [];
         }
     }
 
     public function showTicketsByPassenger($passenger)
     {
         try {
-            $sql = 'SELECT  t.date AS date, t.price AS price, v.brand AS brand, v.model AS model, v.plate AS plate,  co.name AS origin, cd.name AS destination, r.distance AS distance
-            FROM tickets t
-            INNER JOIN routes r ON t.route=r.id
-            INNER JOIN cities co ON r.origin=co.id
-            INNER JOIN cities cd ON r.destination=cd.id
-            INNER JOIN users u ON t.passenger=u.id 
-            INNER JOIN vehicles v ON t.vehicle=v.id          
-            WHERE t.passenger = ?;';
+            $sql = 'SELECT t.date AS date, t.price AS price, v.brand AS brand, v.model AS model,
+                           v.plate AS plate, co.name AS origin, cd.name AS destination, r.distance AS distance
+                    FROM tickets t
+                    INNER JOIN routes r ON t.route = r.id
+                    INNER JOIN cities co ON r.origin = co.id
+                    INNER JOIN cities cd ON r.destination = cd.id
+                    INNER JOIN users u ON t.passenger = u.id
+                    INNER JOIN vehicles v ON t.vehicle = v.id
+                    WHERE t.passenger = ?;';
             $pre = $this->pdo->prepare($sql);
             $pre->bindValue(1, $passenger);
+
             if ($pre->execute()) {
                 return $pre->fetchAll(PDO::FETCH_ASSOC);
-            } else {
-                print_r($pre->errorInfo());
             }
-        } catch (PDOException $errorShowTicketsByPassenger) {
-            echo $errorShowTicketsByPassenger->getMessage();
+
+            error_log("Erro ao buscar passagens do passageiro: " . implode(', ', $pre->errorInfo()));
+            return false;
+        } catch (PDOException $e) {
+            error_log("Erro ao buscar passagens do passageiro: " . $e->getMessage());
             return false;
         }
     }
-    
+
     public function calculatePrice($distance)
     {
         return $distance * 0.5;
