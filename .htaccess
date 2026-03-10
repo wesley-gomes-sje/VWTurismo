@@ -1,0 +1,8 @@
+RewriteEngine On
+
+# Não redireciona arquivos ou diretórios reais
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# Encaminha tudo para index.php preservando REQUEST_URI
+RewriteRule ^(.*)$ index.php [QSA,L]
