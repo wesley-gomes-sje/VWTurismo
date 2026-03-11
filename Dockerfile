@@ -14,6 +14,9 @@ RUN apt-get update && apt-get install -y \
 # Habilite o mod_rewrite para URLs amigáveis
 RUN a2enmod rewrite
 
+# Permite .htaccess sobrescrever configurações do Apache
+RUN sed -i 's/AllowOverride None/AllowOverride All/g' /etc/apache2/apache2.conf
+
 # Copie os arquivos do backend para o diretório root do Apache
 COPY . /var/www/html/
 
