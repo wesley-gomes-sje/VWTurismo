@@ -11,6 +11,7 @@
  */
 
 use App\Controller\Api\AuthApiController;
+use App\Controller\Api\DocsController;
 use App\Controller\Api\CityApiController;
 use App\Controller\Api\RouteApiController;
 use App\Controller\Api\TicketApiController;
@@ -20,6 +21,10 @@ use App\Middleware\JwtMiddleware;
 
 $auth      = fn(array $handler) => JwtMiddleware::protect($handler);
 $adminOnly = fn(array $handler) => JwtMiddleware::protect($handler, 'admin');
+
+// --- Documentação (público) ---
+$router->add('GET', '/api/docs',         [DocsController::class, 'ui']);
+$router->add('GET', '/api/openapi.json', [DocsController::class, 'spec']);
 
 // --- Auth (público) ---
 $router->add('POST', '/api/auth/login',    [AuthApiController::class, 'login']);

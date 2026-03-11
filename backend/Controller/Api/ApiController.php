@@ -3,7 +3,22 @@
 namespace App\Controller\Api;
 
 use App\Middleware\JwtMiddleware;
+use OpenApi\Attributes as OA;
 
+#[OA\Info(
+    title: 'VWTurismo API',
+    version: '1.0.0',
+    description: 'API REST da plataforma VWTurismo — venda de passagens de ônibus.',
+    contact: new OA\Contact(name: 'VWTurismo', email: 'contato@vwturismo.com.br')
+)]
+#[OA\Server(url: '/api', description: 'Servidor principal')]
+#[OA\SecurityScheme(
+    securityScheme: 'bearerAuth',
+    type: 'http',
+    scheme: 'bearer',
+    bearerFormat: 'JWT',
+    description: 'Informe o token JWT obtido em POST /api/auth/login'
+)]
 abstract class ApiController
 {
     protected function json(mixed $data, int $status = 200): void

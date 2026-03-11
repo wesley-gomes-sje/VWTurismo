@@ -4,6 +4,7 @@ namespace App\Controller\Api;
 
 use App\Model\Route;
 use App\Model\Ticket;
+use OpenApi\Attributes as OA;
 
 class TicketApiController extends ApiController
 {
@@ -15,6 +16,16 @@ class TicketApiController extends ApiController
         $this->route  = $route  ?? new Route();
     }
 
+    #[OA\Get(
+        path: '/tickets',
+        summary: 'Listar passagens (admin: todas; user: próprias)',
+        tags: ['Passagens'],
+        security: [['bearerAuth' => []]],
+        responses: [
+            new OA\Response(response: 200, description: 'Lista de passagens'),
+            new OA\Response(response: 401, description: 'Não autorizado'),
+        ]
+    )]
     public function index(): void
     {
         $user = $this->currentUser();
@@ -26,6 +37,17 @@ class TicketApiController extends ApiController
         $this->success($data ?: []);
     }
 
+    #[OA\Get(
+        path: '/tickets/{id}',
+        summary: 'Detalhe de uma passagem',
+        tags: ['Passagens'],
+        security: [['bearerAuth' => []]],
+        parameters: [new OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))],
+        responses: [
+            new OA\Response(response: 200, description: 'Dados da passagem'),
+            new OA\Response(response: 404, description: 'Passagem não encontrada'),
+        ]
+    )]
     public function show(string $id): void
     {
         $ticket = $this->ticket->show($id);
@@ -38,6 +60,29 @@ class TicketApiController extends ApiController
         $this->success($ticket);
     }
 
+    #[OA\Post(
+        path: '/tickets',
+        summary: 'Comprar passagem',
+        tags: ['Passagens'],
+        security: [['bearerAuth' => []]],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                required: ['origin', 'destination', 'vehicle_id', 'date'],
+                properties: [
+                    new OA\Property(property: 'origin',      type: 'integer', description: 'ID da cidade de origem',  example: 1),
+                    new OA\Property(property: 'destination', type: 'integer', description: 'ID da cidade de destino', example: 2),
+                    new OA\Property(property: 'vehicle_id',  type: 'integer', description: 'ID do veículo',           example: 3),
+                    new OA\Property(property: 'date',        type: 'string',  format: 'date',                         example: '2025-06-15'),
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(response: 201, description: 'Passagem registrada'),
+            new OA\Response(response: 404, description: 'Rota não encontrada'),
+            new OA\Response(response: 422, description: 'Campos obrigatórios ausentes'),
+        ]
+    )]
     public function store(): void
     {
         $body        = $this->body();

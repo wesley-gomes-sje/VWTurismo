@@ -3,6 +3,7 @@
 namespace App\Controller\Api;
 
 use App\Model\Vehicle;
+use OpenApi\Attributes as OA;
 
 class VehicleApiController extends ApiController
 {
@@ -11,11 +12,44 @@ class VehicleApiController extends ApiController
         $this->vehicle = $vehicle ?? new Vehicle();
     }
 
+    #[OA\Get(
+        path: '/vehicles',
+        summary: 'Listar veículos',
+        tags: ['Veículos'],
+        security: [['bearerAuth' => []]],
+        responses: [
+            new OA\Response(response: 200, description: 'Lista de veículos'),
+            new OA\Response(response: 401, description: 'Não autorizado'),
+        ]
+    )]
     public function index(): void
     {
         $this->success($this->vehicle->all());
     }
 
+    #[OA\Post(
+        path: '/vehicles',
+        summary: 'Cadastrar veículo (admin)',
+        tags: ['Veículos'],
+        security: [['bearerAuth' => []]],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                required: ['brand', 'model', 'plate', 'year'],
+                properties: [
+                    new OA\Property(property: 'brand', type: 'string', example: 'Volkswagen'),
+                    new OA\Property(property: 'model', type: 'string', example: 'Comfortline'),
+                    new OA\Property(property: 'plate', type: 'string', example: 'ABC1D23'),
+                    new OA\Property(property: 'year',  type: 'integer', example: 2023),
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(response: 201, description: 'Veículo cadastrado'),
+            new OA\Response(response: 401, description: 'Não autorizado'),
+            new OA\Response(response: 422, description: 'Campos obrigatórios ausentes'),
+        ]
+    )]
     public function store(): void
     {
         $body  = $this->body();

@@ -5,6 +5,7 @@ namespace App\Controller\Api;
 use App\Model\Login;
 use App\Model\User;
 use App\Services\JwtService;
+use OpenApi\Attributes as OA;
 
 class AuthApiController extends ApiController
 {
@@ -16,6 +17,43 @@ class AuthApiController extends ApiController
         $this->userModel  = $userModel  ?? new User();
     }
 
+    #[OA\Post(
+        path: '/auth/login',
+        summary: 'Autenticar usuário',
+        tags: ['Auth'],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                required: ['email', 'password'],
+                properties: [
+                    new OA\Property(property: 'email',    type: 'string', format: 'email', example: 'admin@vwturismo.com'),
+                    new OA\Property(property: 'password', type: 'string', format: 'password', example: 'secret123'),
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Login bem-sucedido — retorna JWT',
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: 'success', type: 'boolean', example: true),
+                        new OA\Property(property: 'data', properties: [
+                            new OA\Property(property: 'token', type: 'string'),
+                            new OA\Property(property: 'user', properties: [
+                                new OA\Property(property: 'id',      type: 'integer'),
+                                new OA\Property(property: 'name',    type: 'string'),
+                                new OA\Property(property: 'email',   type: 'string'),
+                                new OA\Property(property: 'profile', type: 'string', enum: ['admin', 'user']),
+                            ], type: 'object'),
+                        ], type: 'object'),
+                    ]
+                )
+            ),
+            new OA\Response(response: 401, description: 'Credenciais inválidas'),
+            new OA\Response(response: 422, description: 'Campos obrigatórios ausentes'),
+        ]
+    )]
     public function login(): void
     {
         $body     = $this->body();
@@ -52,6 +90,27 @@ class AuthApiController extends ApiController
         ], 'Login realizado com sucesso.');
     }
 
+    #[OA\Post(
+        path: '/auth/register',
+        summary: 'Cadastrar novo cliente',
+        tags: ['Auth'],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                required: ['name', 'email', 'password'],
+                properties: [
+                    new OA\Property(property: 'name',     type: 'string', example: 'João Silva'),
+                    new OA\Property(property: 'email',    type: 'string', format: 'email'),
+                    new OA\Property(property: 'password', type: 'string', format: 'password'),
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(response: 201, description: 'Usuário cadastrado com sucesso'),
+            new OA\Response(response: 409, description: 'E-mail já cadastrado'),
+            new OA\Response(response: 422, description: 'Campos inválidos'),
+        ]
+    )]
     public function register(): void
     {
         $body     = $this->body();
