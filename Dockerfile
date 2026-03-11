@@ -14,8 +14,11 @@ RUN apt-get update && apt-get install -y \
 # Habilite o mod_rewrite para URLs amigáveis
 RUN a2enmod rewrite
 
-# Copie os arquivos do projeto para o diretório root do Apache
+# Copie os arquivos do backend para o diretório root do Apache
 COPY . /var/www/html/
+
+# Instale dependências do Composer
+RUN cd /var/www/html && composer install --no-interaction --optimize-autoloader
 
 # Dê permissões para o diretório do Apache
 RUN chown -R www-data:www-data /var/www/html

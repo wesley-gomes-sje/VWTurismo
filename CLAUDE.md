@@ -160,6 +160,10 @@ public function __construct(?PDO $pdo = null)
 | 6 | Refatorar Controllers (extrair helpers) | ✅ Concluída | `refactor/etapa-6-controllers` | — |
 | 7 | Refatorar Views (templates reais, sem concatenação) | ✅ Concluída | `refactor/etapa-7-views` | — |
 | 8 | Limpeza final (JWT removido, stubs deletados) | ✅ Concluída | `refactor/etapa-8-cleanup` | — |
+| **9** | **Separar projeto em backend/ e frontend/** | ⬜ Pendente | `feat/etapa-9-separar-backend-frontend` | — |
+| **10** | **API REST com autenticação JWT** | ⬜ Pendente | `feat/etapa-10-api-rest-jwt` | — |
+| **11** | **Testes da API (TDD)** | ⬜ Pendente | `feat/etapa-11-testes-api` | — |
+| **12** | **Documentação Swagger / OpenAPI** | ⬜ Pendente | `feat/etapa-12-swagger` | — |
 
 ---
 
@@ -360,14 +364,111 @@ refactor: move session management from loginModel to loginController
 
 ---
 
-## Etapa 6 — Próxima (planejamento)
+## Fase 2 — Separação Backend / Frontend + API REST + JWT
 
-**Objetivo:** Refatorar Controllers — extrair helpers duplicados.
+> Início após conclusão das Etapas 1–8. Branch base: `esteira1-ai`.
+
+---
+
+### Visão geral
+
+O projeto será dividido em duas pastas na raiz:
+
+```
+VWTurismo/
+├── backend/    ← API REST PHP com JWT
+└── frontend/   ← (a definir — React/Vue/outro)
+```
+
+---
+
+### Etapa 9 — Separar projeto em backend/ e frontend/
+
+**Branch:** `feat/etapa-9-separar-backend-frontend`
+**Status:** ⬜ Pendente
 
 **O que será feito:**
-- Extrair `sanitizeString()` duplicado em todos os controllers para um helper ou trait
-- Remover `session_start()` do `loginController` (já feito no `index.php`)
-- Garantir que todos os controllers recebem dependências via construtor
+- Mover todo o código PHP atual para `backend/`
+- Criar estrutura inicial de `frontend/` (pasta vazia com README)
+- Ajustar caminhos do Composer, `.htaccess` e `docker-compose.yml`
+- Garantir que os testes continuam passando
+
+---
+
+### Etapa 10 — API REST com autenticação JWT
+
+**Branch:** `feat/etapa-10-api-rest-jwt`
+**Status:** ⬜ Pendente
+
+**O que será feito:**
+- Reinstalar `firebase/php-jwt` no `backend/`
+- Substituir autenticação por Session por autenticação JWT
+- Criar middleware `JwtMiddleware` que valida Bearer token no header `Authorization`
+- Criar `Api\Controller\*` para responder JSON (sem View)
+- Criar `routes/api.php` com mapeamento RESTful explícito
+- Adicionar `CorsMiddleware` para liberar acesso do frontend
+
+**Endpoints planejados:**
+
+| Método | URI | Acesso | Descrição |
+|--------|-----|--------|-----------|
+| POST | `/api/auth/login` | Público | Retorna JWT |
+| POST | `/api/auth/register` | Público | Cria usuário (profile=user) |
+| GET | `/api/cities` | Autenticado | Lista cidades ativas |
+| POST | `/api/cities` | Admin | Cria cidade |
+| PUT | `/api/cities/{id}` | Admin | Atualiza cidade |
+| DELETE | `/api/cities/{id}` | Admin | Soft delete cidade |
+| GET | `/api/vehicles` | Autenticado | Lista veículos |
+| POST | `/api/vehicles` | Admin | Cria veículo |
+| PUT | `/api/vehicles/{id}` | Admin | Atualiza veículo |
+| DELETE | `/api/vehicles/{id}` | Admin | Remove veículo |
+| GET | `/api/routes` | Autenticado | Lista rotas |
+| POST | `/api/routes` | Admin | Cria rota |
+| PUT | `/api/routes/{id}` | Admin | Atualiza rota |
+| DELETE | `/api/routes/{id}` | Admin | Remove rota |
+| GET | `/api/tickets` | Autenticado | Lista passagens (admin=todas, user=próprias) |
+| POST | `/api/tickets` | Autenticado | Compra passagem |
+| GET | `/api/tickets/{id}` | Autenticado | Detalhe de passagem |
+| PUT | `/api/tickets/{id}` | Admin | Atualiza passagem |
+| GET | `/api/users` | Admin | Lista clientes |
+| GET | `/api/users/{id}` | Admin | Detalhe de usuário |
+
+**Estrutura de resposta padrão:**
+```json
+{ "success": true, "data": {...}, "message": "..." }
+{ "success": false, "error": "...", "message": "..." }
+```
+
+---
+
+### Etapa 11 — Testes da API (TDD)
+
+**Branch:** `feat/etapa-11-testes-api`
+**Status:** ⬜ Pendente
+
+**O que será feito:**
+- Testes unitários para `JwtMiddleware`, `CorsMiddleware`, controllers da API
+- Testes de integração simulando requisições HTTP completas
+- Cobertura mínima de todos os endpoints listados na Etapa 10
+
+---
+
+### Etapa 12 — Documentação com Swagger / OpenAPI
+
+**Branch:** `feat/etapa-12-swagger`
+**Status:** ⬜ Pendente
+
+**O que será feito:**
+- Instalar `zircote/swagger-php` no `backend/`
+- Anotar todos os controllers da API com atributos OpenAPI
+- Gerar `public/api-docs/openapi.json` automaticamente
+- Servir Swagger UI em `/api/docs`
+
+---
+
+### Fase 3 — Frontend (após backend concluído)
+
+**Status:** ⬜ Aguardando definição de stack (React / Vue / outro)
 
 ---
 
