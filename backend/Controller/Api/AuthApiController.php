@@ -8,9 +8,17 @@ use App\Services\JwtService;
 
 class AuthApiController extends ApiController
 {
+    public function __construct(
+        private ?Login $loginModel = null,
+        private ?User  $userModel  = null
+    ) {
+        $this->loginModel = $loginModel ?? new Login();
+        $this->userModel  = $userModel  ?? new User();
+    }
+
     public function login(): void
     {
-        $body = $this->body();
+        $body     = $this->body();
         $email    = trim($body['email'] ?? '');
         $password = trim($body['password'] ?? '');
 
@@ -19,8 +27,7 @@ class AuthApiController extends ApiController
             return;
         }
 
-        $loginModel = new Login();
-        $user = $loginModel->login($email, $password);
+        $user = $this->loginModel->login($email, $password);
 
         if (!$user) {
             $this->error('Credenciais inválidas.', 401);
@@ -47,7 +54,7 @@ class AuthApiController extends ApiController
 
     public function register(): void
     {
-        $body = $this->body();
+        $body     = $this->body();
         $name     = trim($body['name'] ?? '');
         $email    = trim($body['email'] ?? '');
         $password = trim($body['password'] ?? '');
@@ -62,18 +69,16 @@ class AuthApiController extends ApiController
             return;
         }
 
-        $userModel = new User();
-
-        if ($userModel->show($email)) {
+        if ($this->userModel->show($email)) {
             $this->error('E-mail já cadastrado.', 409);
             return;
         }
 
-        $userModel->setName($name);
-        $userModel->setEmail($email);
-        $userModel->setPassword(password_hash($password, PASSWORD_BCRYPT));
+        $this->userModel->setName($name);
+        $this->userModel->setEmail($email);
+        $this->userModel->setPassword(password_hash($password, PASSWORD_BCRYPT));
 
-        if (!$userModel->register()) {
+        if (!$this->userModel->register()) {
             $this->error('Erro ao cadastrar usuário.', 500);
             return;
         }

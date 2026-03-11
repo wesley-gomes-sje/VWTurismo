@@ -6,18 +6,20 @@ use App\Model\User;
 
 class UserApiController extends ApiController
 {
+    public function __construct(private ?User $user = null)
+    {
+        $this->user = $user ?? new User();
+    }
+
     public function index(): void
     {
-        $users = (new User())->showCustomers();
-        $this->success($users);
+        $this->success($this->user->showCustomers());
     }
 
     public function show(string $id): void
     {
-        $user = new User($id);
-        $all  = $user->all();
-
-        $found = array_values(array_filter($all, fn($u) => $u['id'] ?? null == $id));
+        $all   = $this->user->all();
+        $found = array_values(array_filter($all, fn($u) => ($u['id'] ?? null) == $id));
 
         if (!$found) {
             $this->error('Usuário não encontrado.', 404);

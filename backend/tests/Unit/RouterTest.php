@@ -192,4 +192,63 @@ class RouterTest extends TestCase
         $this->assertFalse($getHandled);
         $this->assertTrue($postHandled);
     }
+
+    // --- URI params ---
+
+    public function testDispatchMatchesRouteWithSingleUriParam(): void
+    {
+        $called = false;
+        $router = new Router();
+        $router->add('GET', '/api/cities/{id}', function () use (&$called) {
+            $called = true;
+        });
+
+        $result = $router->dispatch('GET', '/api/cities/42');
+
+        $this->assertTrue($called);
+        $this->assertTrue($result);
+    }
+
+    public function testDispatchPassesUriParamToHandler(): void
+    {
+        $received = null;
+        $router   = new Router();
+        $router->add('DELETE', '/api/cities/{id}', function (string $id) use (&$received) {
+            $received = $id;
+        });
+
+        $router->dispatch('DELETE', '/api/cities/99');
+
+        $this->assertSame('99', $received);
+    }
+
+    public function testDispatchPassesMultipleUriParamsToHandler(): void
+    {
+        $receivedA = null;
+        $receivedB = null;
+        $router    = new Router();
+        $router->add('GET', '/api/{resource}/{id}', function (string $resource, string $id) use (&$receivedA, &$receivedB) {
+            $receivedA = $resource;
+            $receivedB = $id;
+        });
+
+        $router->dispatch('GET', '/api/cities/7');
+
+        $this->assertSame('cities', $receivedA);
+        $this->assertSame('7', $receivedB);
+    }
+
+    public function testExactRouteStillMatchesWhenParamRouteExists(): void
+    {
+        $exactCalled = false;
+        $paramCalled = false;
+        $router      = new Router();
+        $router->add('GET', '/api/cities',      function () use (&$exactCalled) { $exactCalled = true; });
+        $router->add('GET', '/api/cities/{id}', function () use (&$paramCalled) { $paramCalled = true; });
+
+        $router->dispatch('GET', '/api/cities');
+
+        $this->assertTrue($exactCalled);
+        $this->assertFalse($paramCalled);
+    }
 }

@@ -7,21 +7,28 @@ use App\Model\Ticket;
 
 class TicketApiController extends ApiController
 {
+    public function __construct(
+        private ?Ticket $ticket = null,
+        private ?Route  $route  = null
+    ) {
+        $this->ticket = $ticket ?? new Ticket();
+        $this->route  = $route  ?? new Route();
+    }
+
     public function index(): void
     {
-        $ticket = new Ticket();
-        $user   = $this->currentUser();
+        $user = $this->currentUser();
 
         $data = ($user['profile'] === 'admin')
-            ? $ticket->all()
-            : $ticket->showTicketsByPassenger($user['sub']);
+            ? $this->ticket->all()
+            : $this->ticket->showTicketsByPassenger($user['sub']);
 
         $this->success($data ?: []);
     }
 
     public function show(string $id): void
     {
-        $ticket = (new Ticket())->show($id);
+        $ticket = $this->ticket->show($id);
 
         if (!$ticket) {
             $this->error('Passagem não encontrada.', 404);
@@ -44,30 +51,29 @@ class TicketApiController extends ApiController
             return;
         }
 
-        $route = (new Route())->check($origin, $destination);
+        $route = $this->route->check($origin, $destination);
 
         if (!$route) {
             $this->error('Rota não encontrada para origem e destino informados.', 404);
             return;
         }
 
-        $user   = $this->currentUser();
-        $ticket = new Ticket();
-        $ticket->setPassenger($user['sub']);
-        $ticket->setRoute($route['id']);
-        $ticket->setVehicle($vehicleId);
-        $ticket->setPrice($ticket->calculatePrice((float) $route['distance']));
-        $ticket->setDate($date);
+        $user = $this->currentUser();
+        $this->ticket->setPassenger($user['sub']);
+        $this->ticket->setRoute($route['id']);
+        $this->ticket->setVehicle($vehicleId);
+        $this->ticket->setPrice($this->ticket->calculatePrice((float) $route['distance']));
+        $this->ticket->setDate($date);
 
-        if (!$ticket->register()) {
+        if (!$this->ticket->register()) {
             $this->error('Erro ao registrar passagem.', 500);
             return;
         }
 
         $this->success([
-            'route'    => $route['id'],
-            'price'    => $ticket->getPrice(),
-            'date'     => $date,
+            'route' => $route['id'],
+            'price' => $this->ticket->getPrice(),
+            'date'  => $date,
         ], 'Passagem registrada com sucesso.', 201);
     }
 }

@@ -6,10 +6,14 @@ use App\Model\City;
 
 class CityApiController extends ApiController
 {
+    public function __construct(private ?City $city = null)
+    {
+        $this->city = $city ?? new City();
+    }
+
     public function index(): void
     {
-        $cities = (new City())->all();
-        $this->success($cities);
+        $this->success($this->city->all());
     }
 
     public function store(): void
@@ -22,10 +26,9 @@ class CityApiController extends ApiController
             return;
         }
 
-        $city = new City();
-        $city->setName($name);
+        $this->city->setName($name);
 
-        if (!$city->register()) {
+        if (!$this->city->register()) {
             $this->error('Erro ao cadastrar cidade.', 500);
             return;
         }
@@ -43,14 +46,12 @@ class CityApiController extends ApiController
             return;
         }
 
-        $city = new City();
-
-        if (!$city->show($id)) {
+        if (!$this->city->show($id)) {
             $this->error('Cidade não encontrada.', 404);
             return;
         }
 
-        if (!$city->edit($id, $name)) {
+        if (!$this->city->edit($id, $name)) {
             $this->error('Erro ao atualizar cidade.', 500);
             return;
         }
@@ -60,14 +61,12 @@ class CityApiController extends ApiController
 
     public function destroy(string $id): void
     {
-        $city = new City();
-
-        if (!$city->show($id)) {
+        if (!$this->city->show($id)) {
             $this->error('Cidade não encontrada.', 404);
             return;
         }
 
-        if (!$city->delete($id)) {
+        if (!$this->city->delete($id)) {
             $this->error('Erro ao remover cidade.', 500);
             return;
         }

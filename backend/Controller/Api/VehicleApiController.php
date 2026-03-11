@@ -6,10 +6,14 @@ use App\Model\Vehicle;
 
 class VehicleApiController extends ApiController
 {
+    public function __construct(private ?Vehicle $vehicle = null)
+    {
+        $this->vehicle = $vehicle ?? new Vehicle();
+    }
+
     public function index(): void
     {
-        $vehicles = (new Vehicle())->all();
-        $this->success($vehicles);
+        $this->success($this->vehicle->all());
     }
 
     public function store(): void
@@ -25,13 +29,12 @@ class VehicleApiController extends ApiController
             return;
         }
 
-        $vehicle = new Vehicle();
-        $vehicle->setBrand($brand);
-        $vehicle->setModel($model);
-        $vehicle->setPlate($plate);
-        $vehicle->setYear($year);
+        $this->vehicle->setBrand($brand);
+        $this->vehicle->setModel($model);
+        $this->vehicle->setPlate($plate);
+        $this->vehicle->setYear($year);
 
-        if (!$vehicle->register()) {
+        if (!$this->vehicle->register()) {
             $this->error('Erro ao cadastrar veículo.', 500);
             return;
         }

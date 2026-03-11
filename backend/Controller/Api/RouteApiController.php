@@ -6,10 +6,14 @@ use App\Model\Route;
 
 class RouteApiController extends ApiController
 {
+    public function __construct(private ?Route $route = null)
+    {
+        $this->route = $route ?? new Route();
+    }
+
     public function index(): void
     {
-        $routes = (new Route())->all();
-        $this->success($routes ?: []);
+        $this->success($this->route->all() ?: []);
     }
 
     public function store(): void
@@ -24,12 +28,11 @@ class RouteApiController extends ApiController
             return;
         }
 
-        $route = new Route();
-        $route->setOrigin($origin);
-        $route->setDestination($destination);
-        $route->setDistance((float) $distance);
+        $this->route->setOrigin($origin);
+        $this->route->setDestination($destination);
+        $this->route->setDistance((float) $distance);
 
-        if (!$route->register()) {
+        if (!$this->route->register()) {
             $this->error('Erro ao cadastrar rota.', 500);
             return;
         }
