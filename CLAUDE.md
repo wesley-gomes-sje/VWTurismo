@@ -160,7 +160,7 @@ public function __construct(?PDO $pdo = null)
 | 6 | Refatorar Controllers (extrair helpers) | ✅ Concluída | `refactor/etapa-6-controllers` | — |
 | 7 | Refatorar Views (templates reais, sem concatenação) | ✅ Concluída | `refactor/etapa-7-views` | — |
 | 8 | Limpeza final (JWT removido, stubs deletados) | ✅ Concluída | `refactor/etapa-8-cleanup` | — |
-| **9** | **Separar projeto em backend/ e frontend/** | ⬜ Pendente | `feat/etapa-9-separar-backend-frontend` | — |
+| **9** | **Separar projeto em backend/ e frontend/** | ✅ Concluída | `feat/etapa-9-separar-backend-frontend` | — |
 | **10** | **API REST com autenticação JWT** | ⬜ Pendente | `feat/etapa-10-api-rest-jwt` | — |
 | **11** | **Testes da API (TDD)** | ⬜ Pendente | `feat/etapa-11-testes-api` | — |
 | **12** | **Documentação Swagger / OpenAPI** | ⬜ Pendente | `feat/etapa-12-swagger` | — |
