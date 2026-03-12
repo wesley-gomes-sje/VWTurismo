@@ -1,3 +1,5 @@
 .env
 vendor
 .idea
+context.md
+.phpunit.result.cache
